@@ -16,7 +16,7 @@ module.exports = function(app){
         }
        })
     
-    app.route('/test').get((req,res,next)=>{
+    app.route('/notes').get((req,res,next)=>{
         const notes = req.query.notes
         try{
             if(notes){
@@ -29,14 +29,14 @@ module.exports = function(app){
             res.redirect('/')
         }
         },(req,res)=>{
-            console.log('chained: '+ req.query.notes)
+            const notes = req.query.notes;
+            res.json({message:notes})
         })
-    // app.route('/test').post((req,res)=>{
-    //     // console.log(req.query)
-    //     const { textarea, name } = req.body
-    //     console.log(req.body)
-    //     res.json({name,textarea})
-    // })
+    app.route('/').post((req,res)=>{
+        // console.log(req.query)
+        const { notes } = req.body
+        console.log(notes)
+    })
        
 
 
