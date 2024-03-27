@@ -16,10 +16,21 @@ module.exports = function(app){
         }
        })
     
-    // app.route('/test').get((req,res)=>{
-    //     console.log(req.query)
-    //     console.log(req.body)
-    // })
+    app.route('/test').get((req,res,next)=>{
+        const notes = req.query.notes
+        try{
+            if(notes){
+                console.log(notes)
+                next();
+            }
+        }
+        catch(err){
+            console.log(err)
+            res.redirect('/')
+        }
+        },(req,res)=>{
+            console.log('chained: '+ req.query.notes)
+        })
     // app.route('/test').post((req,res)=>{
     //     // console.log(req.query)
     //     const { textarea, name } = req.body

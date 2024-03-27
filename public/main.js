@@ -13,7 +13,6 @@ document.querySelector('.post').addEventListener('click',e=>{
     if(textarea.value){
         li.textContent = textarea.value;
         listContainer.appendChild(li);
-        textarea.value=''
         let items = document.querySelectorAll('.textarea-list-container>li')
 
         console.log(listContainer.children)
