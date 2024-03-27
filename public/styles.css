@@ -39,8 +39,10 @@ textarea{
     justify-content: center;
     /* gap:1rem; */
 }
+
 .textarea-list-container>li{
     color:#fff;
+    transition:25s;
     padding:.25rem 0;
     border:2px dotted #fff;
     transition:.5s;
@@ -85,6 +87,12 @@ color:#fff;
     justify-content: space-evenly;
     list-style-type: none;
 
+}
+.hide-item{
+    opacity:0;
+}
+.show-item{
+    opacity:1;
 }
 
 
