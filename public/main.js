@@ -6,7 +6,7 @@ let textarea = document.querySelector('textarea')
 
 document.querySelector('.post').addEventListener('click',e=>{
     
-    e.preventDefault()
+    // e.preventDefault()
     let li = document.createElement('li')
     li.setAttribute('class','textarea-list-container>li')
 
@@ -23,7 +23,6 @@ document.querySelector('.post').addEventListener('click',e=>{
     return (+a.outerText)-(+b.outerText)
     });
     console.log(items)
-    
     }
     else{
     textarea.value = ''
