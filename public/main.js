@@ -2,19 +2,19 @@
 let listContainer = document.querySelector('.textarea-list-container')
 let textarea = document.querySelector('textarea')
 let api = window.location.origin+'/notes'
-console.log(api)
 
 
+// if(window.location.pathname!=='/notes'){
 
 
-
-fetch(api).then(res=>{
-    return res.json();
-})
-.then(d=>{
-    let arr = [...d]
-     console.log(arr)
-})
-
+//     fetch(api)
+//     .then(res=>{
+//         return res.json();
+//     })
+//     .then(data=>{
+//         let arr = [...data]
+//          console.log(arr)
+//     })
+// }
     
 

@@ -5,6 +5,7 @@ const session = require('express-session')
 const bodyParser = require('body-parser')
 const app = express();
 const routes = require('./routes')
+const { pool } = require('../db')
 const PORT = !process.env.PORT ? 3023 : process.env.PORT
 
 // middleware
@@ -19,7 +20,7 @@ app.use('/public', express.static(`${process.cwd()}/public`));
 
 
 // connect routes.js
-routes(app)
+routes(app,pool)
 
 app.listen(PORT,()=>{
     console.log('You are listening on port: '+ PORT)

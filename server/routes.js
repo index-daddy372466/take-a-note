@@ -1,4 +1,4 @@
-module.exports = function(app){
+module.exports = function(app,pool){
     var path = require('path');
     // res.sendFile(path.resolve('temp/index.html'));
 
@@ -16,32 +16,24 @@ module.exports = function(app){
         }
        })
     
-    app.route('/notes').get((req,res,next)=>{
-        const notes = req.query.notes
-        try{
-            if(notes){
-                console.log(notes)
-                next();
-            }
-        }
-        catch(err){
-            console.log(err)
-            res.redirect('/')
-        }
-        },(req,res)=>{
-            const notes = req.query.notes;
-            res.json({message:notes})
+    app.route('/notes').post(async(req,res)=>{
+        // identify notes 
+        const notes = req.body.notes;
+        // insert new note into db
+        const insertNote = await pool.query("insert into notepad(notes) values($1)",
+        [notes])
+
+        // get all fields
+        const getFields = await pool.query('select * from notepad')
+        const rows = getFields.rows;
+        // send notes via json
+        res.json(rows.map(row =>{
+            return {notes:row.notes,timestamp:row.timestamp}
+        }))
         })
-    app.route('/').post((req,res)=>{
-        // console.log(req.query)
-        const { notes } = req.body
-        console.log(notes)
+    app.get('/notes',(req,res)=>{
+        res.redirect('/')
     })
+   
        
-
-
-
-
-
-
 }
