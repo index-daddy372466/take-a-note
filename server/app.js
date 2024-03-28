@@ -9,6 +9,7 @@ const { pool } = require('../db')
 const PORT = !process.env.PORT ? 3023 : process.env.PORT
 
 // middleware
+app.use(express.static('public'))
 app.use(cors())
 app.use(bodyParser.urlencoded({extended:true}))
 app.use(bodyParser.json())
@@ -25,3 +26,4 @@ routes(app,pool)
 app.listen(PORT,()=>{
     console.log('You are listening on port: '+ PORT)
 })
+

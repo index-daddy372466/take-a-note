@@ -22,12 +22,13 @@
                     <p class="textarea item">three</p>
                 </li> -->
             </ol>
-            <div class="instructions"></div>
+            
         </div>
         
 
-        <form class="textarea-form" action="/test" method="post">
-            <textarea name="explanation" maxlength="150" autocapitalize="on" autocorrect="on" placeholder="Enter some notes" cols="50" rows="10"></textarea>
+        <form class="textarea-form" action="/notes" method="POST">
+            <textarea id="textarea" name="notes" cols="50" rows="5"></textarea>
+            <!-- autocapitalize="on" autocorrect="on" placeholder="Enter some notes" -->
             <div class="btn-container">
                 <input type="reset" value="Clear">
                 <input type="submit" value="Post" class="post">

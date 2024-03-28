@@ -8,7 +8,6 @@ module.exports = function(app,pool){
         
         try{
             console.log('request succeeded')
-            res.sendFile(path.resolve('views/index.html'))
         }
         catch(err){
             console.log(err)
@@ -20,22 +19,22 @@ module.exports = function(app,pool){
         // identify notes 
         const notes = req.body.notes;
         // insert new note into db
-        const insertNote = await pool.query("insert into notepad(notes) values($1)",
-        [notes])
-        // // get all fields
-        // const getFields = await pool.query('select * from notepad')
-        // const rows = getFields.rows;
-        // // send notes via json
-        // res.json(rows.map(row =>{
-        //     return {notes:row.notes,timestamp:row.timestamp}
-        // }))
-
-        // alternate ending
-        res.redirect('/')
+        try{
+            if(notes){
+                const insertNote = await pool.query("insert into notepad(notes) values($1)",
+                [notes])
+            }
+            res.redirect('/')
+            
+        }
+        catch(err){
+            console.log(err)
+            res.redirect('/')
+        }
+        
         })
-    app.get('/notes',async(req,res)=>{
-        // res.redirect('/')
 
+    app.get('/notes',async(req,res)=>{
         // alternate ending
         // get all fields
         const getFields = await pool.query('select * from notepad')
