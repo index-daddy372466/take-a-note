@@ -48,6 +48,7 @@ module.exports = function(app,pool){
     })
 
     app.route('/delete').post(async(req,res)=>{
+        
         const notes = req.body.notes;   
         
         try{

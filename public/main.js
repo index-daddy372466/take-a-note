@@ -2,7 +2,7 @@
 let listContainer = document.querySelector('.textarea-list-container')
 let textarea = document.querySelector('textarea')
 let api = window.location.origin+'/notes'
-
+let counter;
 // fetch data from `/notes` endpoint (server/routes.js)
 // We are retrieving api data from psql
 fetch(api)
@@ -84,7 +84,7 @@ $(".post").on('click',function(e){
             const li_btn = document.createElement('button')
             li_btn.classList.add('text-area-list-container>li>button')
             li.classList.add('textarea-list-container>li');
-            let counter = listContainer.children.length+1
+            counter = listContainer.children.length+1
             li.classList.add(counter)
             console.log(counter)
             li.textContent = `${note} - ${testISO}`
@@ -101,6 +101,8 @@ $(".post").on('click',function(e){
 // delete all data
 $(".delete").on('click',function(e){
     e.preventDefault()
+    counter = 0;
+    console.log(counter)
     let note = textarea.value;
     $.ajax({
         type: 'POST',
