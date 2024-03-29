@@ -37,6 +37,18 @@ fetch(api)
             },50 * (x+1))
         }
     }
+    const deleteItem = () => {
+        return [...listContainer.children].forEach((el,index)=>{
+            let btn = el.children[0]
+            btn.addEventListener('click', e => {
+                console.log('you clicked me!')
+            })
+        })
+    }
+    deleteItem();
+   
+
+
 })
 
 
@@ -124,7 +136,5 @@ $(".delete").on('click',function(e){
     return [...listContainer.children].forEach(c=>listContainer.removeChild(c))
     
 })
-    
 
-    
 
