@@ -13,7 +13,13 @@ module.exports = function(app,pool){
             res.json({message:'you are not the trusted user'})
         }
     })
-    
+    app.get('/delete/:id',async(req,res)=>{
+        const id = req.params.id;
+        console.log(id)
+        let db_count = await pool.query("select count(id) from notepad");
+        count = db_count.rows[0].count;
+        console.log(count)
+    })
     app.route('/notes').post(async(req,res)=>{
         // identify notes 
         const notes = req.body.notes;

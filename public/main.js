@@ -42,6 +42,11 @@ fetch(api)
             let btn = el.children[0]
             btn.addEventListener('click', e => {
                 console.log('you clicked me!')
+                let id = index+1
+                $.ajax({
+                    type: 'GET',
+                    url: `/delete/${id}`
+                });
             })
         })
     }
