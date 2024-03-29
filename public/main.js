@@ -13,11 +13,14 @@ fetch(api)
     let arr = [...data]
     //  console.log(arr)
         arr.forEach((note,index)=>{
+        const li_btn = document.createElement('button')
+        li_btn.classList.add('text-area-list-container>li>button')
         const li = document.createElement('li')
         li.classList.add('textarea-list-container>li');
         li.classList.add('hide-item')
         li.textContent = `${note.notes} - ${note.timestamp}`
         listContainer.append(li)
+        li.appendChild(li_btn)
         })
         const items = document.querySelectorAll('.textarea-list-container>li')
     // console.log(items)

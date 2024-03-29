@@ -48,7 +48,12 @@ textarea{
     justify-content: center;
     /* gap:1rem; */
 }
-
+.textarea-list-container>li>button{
+    height:20px;
+    width:20px;
+    background:Red;
+    border:2px solid #fff;
+}
 .textarea-list-container>li{
     color:#fff;
     transition:25s;
