@@ -3,8 +3,7 @@ module.exports = function(app,pool){
     // res.sendFile(path.resolve('temp/index.html'));
 
     // get homepage
-    app.route('/')
-       .get((req,res)=>{
+    app.route('/').get((req,res)=>{
         
         try{
             console.log('request succeeded')
@@ -13,7 +12,7 @@ module.exports = function(app,pool){
             console.log(err)
             res.json({message:'you are not the trusted user'})
         }
-       })
+    })
     
     app.route('/notes').post(async(req,res)=>{
         // identify notes 
@@ -35,7 +34,7 @@ module.exports = function(app,pool){
             res.redirect('/')
         }
         
-        })
+    })
 
     app.get('/notes',async(req,res)=>{
         // alternate ending
