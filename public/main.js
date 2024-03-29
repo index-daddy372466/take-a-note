@@ -63,14 +63,12 @@ const formatUTC = (date) => {
     return `${year}-${num<10?'0'+num:num}-${day<10?'0'+day:day}T${time}Z`
 
 }
-
 // use ajax to submit form data without page reload
 $(".post").on('click',function(e){
     e.preventDefault();
     textarea.focus();
     const date = new Date().toUTCString();
     const testISO = new Date().toISOString();
-    console.log(date)
     // const mod_date = formatUTC(date);
     let note = textarea.value;
     console.log('You pressed me')
@@ -81,10 +79,18 @@ $(".post").on('click',function(e){
     });
     
         if(note){
+            
             const li = document.createElement('li')
+            const li_btn = document.createElement('button')
+            li_btn.classList.add('text-area-list-container>li>button')
             li.classList.add('textarea-list-container>li');
+            let counter = listContainer.children.length+1
+            li.classList.add(counter)
+            console.log(counter)
             li.textContent = `${note} - ${testISO}`
             listContainer.append(li)
+            li.appendChild(li_btn)
+            // console.log(id)
             textarea.value = ''
         }
         else{

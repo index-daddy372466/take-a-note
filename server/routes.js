@@ -48,7 +48,7 @@ module.exports = function(app,pool){
     })
 
     app.route('/delete').post(async(req,res)=>{
-        const notes = req.body.notes;
+        const notes = req.body.notes;   
         
         try{
             await pool.query("truncate notepad;alter sequence notepad_id_seq restart with 1")
