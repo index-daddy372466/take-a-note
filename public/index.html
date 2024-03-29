@@ -25,13 +25,14 @@
             
         </div>
         
-
+        <form class="textarea-form" action="/delete" method="POST" id="delete"></form>
         <form class="textarea-form" action="/notes" method="POST">
             <textarea id="textarea" name="notes" cols="50" rows="5"></textarea>
             <!-- autocapitalize="on" autocorrect="on" placeholder="Enter some notes" -->
             <div class="btn-container">
                 <input type="reset" value="Clear">
                 <input type="submit" value="Post" class="post">
+                <input type="submit" value="Delete" form="delete" class="delete">
             </div>
             
         </form>

@@ -25,7 +25,7 @@ textarea{
 .btn-container{
     width:100%;
     display:grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: auto auto auto;
     border:4px inset red;
 }
 .btn-container>input{
