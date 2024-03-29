@@ -25,8 +25,9 @@ textarea{
     background-repeat: no-repeat;
     background-position: center;
     background-size:cover;
-    line-height:1.40rem;
+    /* line-height:1.40rem; */
     text-align:none;
+    line-height: 1.5;
     padding: 0 0 0 4.75rem; 
     /* indent */
 }
