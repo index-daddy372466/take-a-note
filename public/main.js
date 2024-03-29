@@ -69,8 +69,9 @@ $(".post").on('click',function(e){
     e.preventDefault();
     textarea.focus();
     const date = new Date().toUTCString();
+    const testISO = new Date().toISOString();
     console.log(date)
-    const mod_date = formatUTC(date);
+    // const mod_date = formatUTC(date);
     let note = textarea.value;
     console.log('You pressed me')
     $.ajax({
@@ -82,7 +83,7 @@ $(".post").on('click',function(e){
         if(note){
             const li = document.createElement('li')
             li.classList.add('textarea-list-container>li');
-            li.textContent = `${note} - ${mod_date}`
+            li.textContent = `${note} - ${testISO}`
             listContainer.append(li)
             textarea.value = ''
         }
