@@ -26,6 +26,9 @@ textarea{
     background-position: center;
     background-size:cover;
     line-height:1.40rem;
+    text-align:none;
+    padding: 0 0 0 4.75rem; 
+    /* indent */
 }
 .btn-container{
     width:100%;
