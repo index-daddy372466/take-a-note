@@ -24,6 +24,9 @@ module.exports = function(app,pool){
                 const insertNote = await pool.query("insert into notepad(notes) values($1)",
                 [notes])
             }
+            else{
+                console.log('you entered nothing')
+            }
             res.redirect('/')
             
         }
@@ -47,7 +50,7 @@ module.exports = function(app,pool){
 
     app.route('/delete').post(async(req,res)=>{
         const notes = req.body.notes;
-        console.log(notes)
+        
         try{
             await pool.query("truncate notepad;alter sequence notepad_id_seq restart with 1")
             res.redirect('/')

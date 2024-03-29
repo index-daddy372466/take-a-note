@@ -77,11 +77,17 @@ $(".post").on('click',function(e){
         url: '/notes',
         data: {notes:note}
     });
-    const li = document.createElement('li')
-          li.classList.add('textarea-list-container>li');
-          li.textContent = `${note} - ${mod_date}`
-          listContainer.append(li)
-    textarea.value = ''
+    
+        if(note){
+            const li = document.createElement('li')
+            li.classList.add('textarea-list-container>li');
+            li.textContent = `${note} - ${mod_date}`
+            listContainer.append(li)
+            textarea.value = ''
+        }
+        else{
+            textarea.value = ''
+        }
 })
 
 // delete all data
@@ -93,6 +99,7 @@ $(".delete").on('click',function(e){
         url: '/delete',
         data: {notes:note}
     });
+    textarea.value = ''
     // remove children
     return [...listContainer.children].forEach(c=>listContainer.removeChild(c))
     
