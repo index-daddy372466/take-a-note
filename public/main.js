@@ -73,6 +73,7 @@ $(".post").on('click',function(e){
     const date = new Date().toUTCString();
     const testISO = new Date().toISOString();
     // const mod_date = formatUTC(date);
+    textarea.value = textarea.value.replace(/[;\)\(\_\+\=\^\%\$\#\@\!\&\*\|\[\])]/g,'')
     let note = textarea.value;
     console.log('You pressed me')
     $.ajax({
@@ -106,6 +107,7 @@ $(".delete").on('click',function(e){
     e.preventDefault()
     counter = 0;
     console.log(counter)
+    textarea.value=textarea.value.replace(/[;\)\(\_\+\=\^\%\$\#\@\!\&\*\|\[\])]/g,'')
     let note = textarea.value;
     $.ajax({
         type: 'POST',
