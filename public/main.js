@@ -67,6 +67,7 @@ const formatUTC = (date) => {
 // use ajax to submit form data without page reload
 $(".post").on('click',function(e){
     e.preventDefault();
+    textarea.focus();
     const date = new Date().toUTCString();
     console.log(date)
     const mod_date = formatUTC(date);
