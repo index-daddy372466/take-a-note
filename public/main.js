@@ -6,7 +6,7 @@ let counter;
 
 // helper function to format textarea (security)
 const formatTextArea = (textarea) => {
-    textarea.value=textarea.value.replace(/[;\)\(\_\+\=\^\%\$\#\@\!\&\*\|\[\])]/g,'')
+    textarea.value=textarea.value.replace(/[;\)\(\_\~\+\=\^\%\$\#\@\!\&\*\|\[\])]/g,'')
 }
 // fetch data from `/notes` endpoint (server/routes.js)
 // We are retrieving api data from psql
