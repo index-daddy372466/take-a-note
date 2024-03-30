@@ -2,7 +2,6 @@
 let listContainer = document.querySelector('.textarea-list-container')
 let textarea = document.querySelector('textarea')
 let api = window.location.origin+'/notes'
-let counter=0;
 
 // helper function to format textarea (security)
 const formatTextArea = (textarea) => {
@@ -23,11 +22,10 @@ fetch(api)
         const li = document.createElement('li')
         li.classList.add('textarea-list-container>li');
         li.classList.add('hide-item')
-        li.classList.add((++counter))
         li.textContent = `${note.notes} - ${note.timestamp}`
         listContainer.append(li)
         li.appendChild(li_btn)
-        console.log(...listContainer.children)
+        // console.log(...listContainer.children)
 
         })
         const items = document.querySelectorAll('.textarea-list-container>li')
@@ -47,8 +45,6 @@ fetch(api)
             btn.addEventListener('click', e => {
                 e.preventDefault()
                 if(listContainer.children.length<=1){
-                    counter=0;
-                    console.log(counter)
                     $.ajax({
                         type: 'POST',
                         url: '/delete',
@@ -57,7 +53,10 @@ fetch(api)
                 }
                 else{
                     console.log('you clicked me!')
-                    let id = +[...el.classList].filter(num=>/[0-9]+/g.test(num)).join``
+                    let indi = index+1
+                    let id = indi
+                        indi = id
+
                     console.log(id)
                     $.ajax({
                         type: 'GET',
@@ -115,7 +114,7 @@ $(".post").on('click',function(e){
     // const mod_date = formatUTC(date);
     formatTextArea(textarea)
     let note = textarea.value;
-    console.log('You pressed me')
+    console.log('You pressed Post')
     $.ajax({
         type: 'POST',
         url: '/notes',
@@ -128,8 +127,7 @@ $(".post").on('click',function(e){
             const li_btn = document.createElement('button')
             li_btn.classList.add('text-area-list-container>li>button')
             li.classList.add('textarea-list-container>li');
-            li.classList.add((++counter))
-            console.log(counter)
+
             li.textContent = `${note} - ${testISO}`
             listContainer.append(li)
             li.appendChild(li_btn)
@@ -142,8 +140,6 @@ $(".post").on('click',function(e){
             //         btn.addEventListener('click', e => {
             //             e.preventDefault()
             //             if(listContainer.children.length<=1){
-            //                 counter=0;
-            //                 console.log(counter)
             //                 $.ajax({
             //                     type: 'POST',
             //                     url: '/delete',
@@ -152,7 +148,7 @@ $(".post").on('click',function(e){
             //             }
             //             else{
             //                 console.log('you clicked me!')
-            //                 let id = +[...el.classList].filter(num=>/[0-9]+/g.test(num)).join``
+            //                 let id = index+1
             //                 console.log(id)
             //                 $.ajax({
             //                     type: 'GET',
@@ -173,8 +169,6 @@ $(".post").on('click',function(e){
 // delete all data
 $(".delete").on('click',function(e){
     e.preventDefault()
-    counter = 0;
-    console.log(counter)
     formatTextArea(textarea)
     let note = textarea.value;
     $.ajax({
