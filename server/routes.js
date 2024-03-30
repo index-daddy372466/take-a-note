@@ -13,20 +13,31 @@ module.exports = function(app,pool){
             res.json({message:'you are not the trusted user'})
         }
     })
-    app.get('/delete/:id',async(req,res)=>{
+
+
+
+    
+    app.delete('/delete/:id',async(req,res)=>{
         const id = req.params.id;
         console.log(id)
         await pool.query("delete from notepad where id=$1",[id])
         console.log('you deleted an item')
     })
+
+
+
+
+
     app.route('/notes').post(async(req,res)=>{
         // identify notes 
+        const id = req.body.id
         const notes = req.body.notes;
         // insert new note into db
         try{
             if(notes){
                 const insertNote = await pool.query("insert into notepad(notes) values($1)",
                 [notes])
+                const getID = await pool.query("select id from notepad where notes=$1",[notes])
             }
             else{
                 console.log('you entered nothing')
@@ -48,7 +59,7 @@ module.exports = function(app,pool){
         const rows = getFields.rows;
         // send notes via json
         res.json(rows.map(row =>{
-            return {notes:row.notes,timestamp:row.timestamp}
+            return {id:row.id,notes:row.notes,timestamp:row.timestamp}
         }))
     })
 
