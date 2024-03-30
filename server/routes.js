@@ -16,9 +16,8 @@ module.exports = function(app,pool){
     app.get('/delete/:id',async(req,res)=>{
         const id = req.params.id;
         console.log(id)
-        let db_count = await pool.query("select count(id) from notepad");
-        count = db_count.rows[0].count;
-        console.log(count)
+        await pool.query("delete from notepad where id=$1",[id])
+        console.log('you deleted an item')
     })
     app.route('/notes').post(async(req,res)=>{
         // identify notes 

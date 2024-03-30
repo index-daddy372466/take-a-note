@@ -2,7 +2,7 @@
 let listContainer = document.querySelector('.textarea-list-container')
 let textarea = document.querySelector('textarea')
 let api = window.location.origin+'/notes'
-let counter;
+let counter=0;
 
 // helper function to format textarea (security)
 const formatTextArea = (textarea) => {
@@ -23,9 +23,12 @@ fetch(api)
         const li = document.createElement('li')
         li.classList.add('textarea-list-container>li');
         li.classList.add('hide-item')
+        li.classList.add((++counter))
         li.textContent = `${note.notes} - ${note.timestamp}`
         listContainer.append(li)
         li.appendChild(li_btn)
+        console.log(...listContainer.children)
+
         })
         const items = document.querySelectorAll('.textarea-list-container>li')
     // console.log(items)
@@ -40,13 +43,28 @@ fetch(api)
     const deleteItem = () => {
         return [...listContainer.children].forEach((el,index)=>{
             let btn = el.children[0]
+            let note = textarea.value;
             btn.addEventListener('click', e => {
-                console.log('you clicked me!')
-                let id = index+1
-                $.ajax({
-                    type: 'GET',
-                    url: `/delete/${id}`
-                });
+                e.preventDefault()
+                if(listContainer.children.length<=1){
+                    counter=0;
+                    console.log(counter)
+                    $.ajax({
+                        type: 'POST',
+                        url: '/delete',
+                        data: {notes:note}
+                    });
+                }
+                else{
+                    console.log('you clicked me!')
+                    let id = +[...el.classList].filter(num=>/[0-9]+/g.test(num)).join``
+                    console.log(id)
+                    $.ajax({
+                        type: 'GET',
+                        url: `/delete/${id}`
+                    });
+                }
+                listContainer.removeChild(e.target.parentElement)
             })
         })
     }
@@ -110,14 +128,42 @@ $(".post").on('click',function(e){
             const li_btn = document.createElement('button')
             li_btn.classList.add('text-area-list-container>li>button')
             li.classList.add('textarea-list-container>li');
-            counter = listContainer.children.length+1
-            li.classList.add(counter)
+            li.classList.add((++counter))
             console.log(counter)
             li.textContent = `${note} - ${testISO}`
             listContainer.append(li)
             li.appendChild(li_btn)
             // console.log(id)
             textarea.value = ''
+            // const deleteItem = () => {
+            //     return [...listContainer.children].forEach((el,index)=>{
+            //         let btn = el.children[0]
+            //         let note = textarea.value;
+            //         btn.addEventListener('click', e => {
+            //             e.preventDefault()
+            //             if(listContainer.children.length<=1){
+            //                 counter=0;
+            //                 console.log(counter)
+            //                 $.ajax({
+            //                     type: 'POST',
+            //                     url: '/delete',
+            //                     data: {notes:note}
+            //                 });
+            //             }
+            //             else{
+            //                 console.log('you clicked me!')
+            //                 let id = +[...el.classList].filter(num=>/[0-9]+/g.test(num)).join``
+            //                 console.log(id)
+            //                 $.ajax({
+            //                     type: 'GET',
+            //                     url: `/delete/${id}`
+            //                 });
+            //             }
+            //             listContainer.removeChild(e.target.parentElement)
+            //         })
+            //     })
+            // }
+            // deleteItem();
         }
         else{
             textarea.value = ''
