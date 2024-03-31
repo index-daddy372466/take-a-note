@@ -110,58 +110,80 @@ const formatUTC = (date) => {
 $(".post").on('click', function (e) {
     e.preventDefault();
     textarea.focus();
-    const date = new Date().toUTCString();
-    const testISO = new Date().toISOString();
+
     // const mod_date = formatUTC(date);
     formatTextArea(textarea)
     let note = textarea.value;
-    console.log('You pressed Post')
-    $.ajax({
+    if (note) {
+        console.log('You are posting info')
+        // post notes to db
+        $.ajax({
         type: 'POST',
         url: '/notes',
-        data: { notes: note }
-    })
+        data: { notes: note },
+        success:function(){
+            console.log('You are getting info')
+            // get notes from db
+            $.ajax({
+            type: 'GET',
+            url: '/notes',
+            success:function(data){
+            console.log(data)
+            let dArr = [...data]
+                    dArr.forEach((note, index) => {
+                        // if index == last item in dArr
+                        if(index==dArr.length-1){
+                            const li_btn2 = document.createElement('button')
+                            li_btn2.classList.add('text-area-list-container>li>button')
+                            const li2 = document.createElement('li')
+                            li2.classList.add('textarea-list-container>li');
+                            li2.textContent = `${note.id} ${note.notes} - ${note.timestamp}`
+                            listContainer.append(li2)
+                            li2.appendChild(li_btn2)
+                            // console.log(...listContainer.children)
+                            textarea.value='';
+                        }
+                    })
+                    //btn click for deleting a specific note
+                return [...listContainer.children].forEach((el, index) => {
+                    if(index==[...listContainer.children].length-1){
+                        let numId = el.textContent.match(/^\d+/).join``
+                    console.log(numId)
+                    let btn = el.children[0]
+                    let note = textarea.value;
+                    const dbId2 = dArr[index].id;
+                
+                    btn.addEventListener('click', e => {
+                        e.preventDefault()
+                        
+                        if (listContainer.children.length <= 1) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '/delete'
+                            });
+                        }
+                        else {
+                            console.log('you deleted me')
+                            
 
-    if (note) {
+                            $.ajax({
+                                type: 'DELETE',
+                                url: `/delete/${dbId2}`
+                            });
+                        }
 
-        const li = document.createElement('li')
-        const li_btn = document.createElement('button')
-        li_btn.classList.add('text-area-list-container>li>button')
-        li.classList.add('textarea-list-container>li');
-
-        li.textContent = `${note} - ${testISO}`
-        listContainer.append(li)
-        li.appendChild(li_btn)
-        // console.log(id)
-        textarea.value = ''
-        const deleteItem = () => {
-            return [...listContainer.children].forEach((el, index) => {
-                let btn = el.children[0]
-                let note = textarea.value;
-                btn.addEventListener('click', e => {
-                    e.preventDefault()
-                    if (listContainer.children.length <= 1) {
-                        $.ajax({
-                            type: 'POST',
-                            url: '/delete',
-                            data: { notes: note }
-                        });
+                        
+                        listContainer.removeChild(e.target.parentElement)
+                    })
                     }
-                    else {
-                        console.log('you deleted me!')
-                        // id
-
-                        $.ajax({
-                            type: 'DELETE',
-                            url: `/delete/${id}`
-                        });
-                    }
-                    listContainer.removeChild(e.target.parentElement)
+                    
                 })
+
+                }
             })
         }
-        deleteItem();
-    }
+    })
+}
     else {
         textarea.value = ''
     }
