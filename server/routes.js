@@ -14,20 +14,6 @@ module.exports = function(app,pool){
         }
     })
 
-
-
-    
-    app.delete('/delete/:id',async(req,res)=>{
-        const id = req.params.id;
-        console.log(id)
-        await pool.query("delete from notepad where id=$1",[id])
-        console.log('you deleted an item')
-    })
-
-
-
-
-
     app.route('/notes').post(async(req,res)=>{
         // identify notes 
         const id = req.body.id
@@ -69,11 +55,29 @@ module.exports = function(app,pool){
         
         try{
             await pool.query("truncate notepad;alter sequence notepad_id_seq restart with 1")
-            res.redirect('/')
+            res.redirect('/');
         }
         catch(err){
             console.log(err)
             res.redirect('/')
+        }
+    })
+    app.delete('/delete/:id',async(req,res)=>{
+        const id = req.params.id;
+        try{
+        if(!id){
+            alert('database is empty')
+            red.redirect('/')
+        }
+        else{
+        console.log(id)
+        await pool.query("delete from notepad where id=$1",[id])
+        console.log('you deleted an item')
+        res.redirect('/')
+        }
+        }
+        catch(err){
+            console.log(err)
         }
     })
    
