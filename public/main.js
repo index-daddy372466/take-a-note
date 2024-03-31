@@ -56,7 +56,7 @@ fetch(api)
                     
 
                     $.ajax({
-                        type: 'DELETE',
+                        type: 'GET',
                         url: `/delete/${dbId}`
                     });
                 }
@@ -167,7 +167,7 @@ $(".post").on('click', function (e) {
                             
 
                             $.ajax({
-                                type: 'DELETE',
+                                type: 'GET',
                                 url: `/delete/${dbId2}`
                             });
                         }
