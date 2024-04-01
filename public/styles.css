@@ -40,6 +40,7 @@ textarea{
     padding: 1rem 0;
 }
 .textarea-form{
+    transition:.25s;
     display:flex;
     flex-direction:column;
     width:100%;
@@ -65,14 +66,17 @@ textarea{
     color:#fff;
     transition:25s;
     padding:.25rem 0;
-    border:2px dotted #fff;
+    border:2px double #fff;
     transition:.5s;
-    /* width:100%; */
+    width:100%;
+    transition:.25s;
     max-width: 500px;
     min-width:100px;
     display:flex;
+    font-size:20px;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    padding:.5rem 1rem;
     flex-wrap:wrap;
     margin: 0 1rem;
     text-align: center;
@@ -92,21 +96,24 @@ color:#fff;
 }
 .textarea-list-container>li:hover{
     color:#000;
-    border:2px dotted #000;
+    border:none;
     background:ghostwhite;
     cursor:pointer;
 }
 #textarea-top{
-    min-height:200px;
-    max-height:200px;
+    min-height:0px;
+    max-height:25vh;
     z-index:997;
     overflow-x:scroll;
+    transition:.25s;
 }
+
 .textarea-list-container{
+    transition:.25s;
     /* border:3px double pink; */
     overflow-x:hidden;
     z-index:998;
-    gap:.15rem;
+    gap:1rem;
     width:100%;
     display:flex;
     flex-direction:column;
@@ -124,6 +131,7 @@ color:#fff;
 
 
 #textarea-container{
+    transition:.25s;
     /* position:absolute; */
     background:#333;
     border: 8px outset lime;
