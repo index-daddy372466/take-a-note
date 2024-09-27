@@ -46,6 +46,10 @@ textarea{
 }
 .btn-container>input{
     padding: 1rem 0;
+    background:ghostwhite;
+    border:none;
+    box-shadow: 0 0 4px .8px #333;
+    height:50px;
 }
 .textarea-form{
     transition:.25s;
