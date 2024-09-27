@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js" integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+  <head>
+    <meta charset="UTF-8" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
+      integrity="sha512-+k1pnlgt4F1H8L7t3z95o3/KO+o78INEcXTbnoJQ/F2VqDVhWoaiVml/OEHv9HsVgxUaVW+IbiZPUJQfF/YxZw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://kit.fontawesome.com/4026a653d4.js" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
     <title>notes App</title>
-</head>
-<body>
+  </head>
+  <body>
     <!--notes text area-->
     <div id="textarea-container" class="hidden">
-        
-        <div id="textarea-top">
-            <ol class="textarea-list-container">
-                <!-- <li class="text-areaitem">
+      <div id="textarea-top">
+        <ol class="textarea-list-container">
+          <!-- <li class="text-areaitem">
                     <p class="textarea item">one</p>
                 </li>
                 <li class="text-areaitem">
@@ -21,22 +27,36 @@
                 <li class="text-areaitem">
                     <p class="textarea item">three</p>
                 </li> -->
-            </ol>
-            
-        </div>
-        
-        <form class="textarea-form" action="/delete" method="POST" id="delete"></form>
-        <form class="textarea-form" action="/notes" method="POST">
-            <textarea id="textarea" name="notes" cols="50" rows="5" wrap=physical></textarea>
-            <!-- autocapitalize="on" autocorrect="on" placeholder="Enter some notes" -->
-            <div class="btn-container">
-                <input type="reset" value="Clear">
-                <input type="submit" value="Post" class="post">
-                <input type="submit" value="Clear Notes" form="delete" class="delete">
-            </div>
-        </form>
+        </ol>
+      </div>
 
+      <form
+        class="textarea-form"
+        action="/delete"
+        method="POST"
+        id="delete"
+      ></form>
+      <form class="textarea-form" action="/notes" method="POST">
+        <textarea
+          id="textarea"
+          name="notes"
+          cols="50"
+          rows="5"
+          wrap="physical"
+        ></textarea>
+        <!-- autocapitalize="on" autocorrect="on" placeholder="Enter some notes" -->
+        <div class="btn-container">
+          <input type="reset" value="Clear" />
+          <input type="submit" value="Post" class="post" />
+          <input
+            type="submit"
+            value="Clear Notes"
+            form="delete"
+            class="delete"
+          />
+        </div>
+      </form>
     </div>
-</body>
-<script type="module" src="main.js"></script>
+  </body>
+  <script type="module" src="main.js"></script>
 </html>

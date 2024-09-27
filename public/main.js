@@ -1,7 +1,20 @@
 // let list = document.querySelectorAll('.textarea-list-container>li')
 let listContainer = document.querySelector(".textarea-list-container");
+let listTop = document.querySelector("#textarea-top");
 let textarea = document.querySelector("textarea");
 let api = "/notes";
+
+
+const liHover = (e) => {
+  let target = e.currentTarget;
+  let bar = target.children[1];
+  bar.classList.add("bar-glow");
+};
+const liOut = (e) => {
+  let target = e.currentTarget;
+  let bar = target.children[1];
+  bar.classList.remove("bar-glow");
+};
 
 // helper function to format textarea (security)
 const formatTextArea = (textarea) => {
@@ -15,28 +28,37 @@ const formatTextArea = (textarea) => {
 fetch(api)
   .then((r) => r.json())
   .then((data) => {
-    console.log(data);
+    // console.log(data);
     let arr = [...data.data];
     //  console.log(arr)
+    // <i class="fa-solid fa-bars"></i>
     arr.forEach((note, index) => {
       const li_btn = document.createElement("button");
+      const icon = document.createElement("i");
       li_btn.classList.add("text-area-list-container>li>button");
       const li = document.createElement("li");
+      li.setAttribute('id','li'+(index+1))
       li.classList.add("textarea-list-container>li");
       li.classList.add("hide-item");
+      icon.classList.add("fa-solid");
+      icon.classList.add("fa-bars");
+      icon.classList.add("drag-elem");
+    //   li.setAttribute('draggable',true)
       li.textContent = note.timestamp + " - " + note.id + ": " + note.notes;
-      listContainer.append(li);
+      listContainer.appendChild(li);
       li.appendChild(li_btn);
-      // console.log(...listContainer.children)
+      li.append(icon);
+      li.addEventListener("mouseover", liHover);
+      li.addEventListener("mouseout", liOut);
+      listTop.scrollTo(0,listTop.scrollHeight);
+
     });
     const items = document.querySelectorAll(".textarea-list-container>li");
     // console.log(items)
     for (let x = 0; x < items.length; x++) {
       if (items[x].classList.contains("hide-item")) {
-        setTimeout(() => {
-          items[x].classList.remove("hide-item");
-          items[x].classList.add("show-item");
-        }, 50 * (x + 1));
+        items[x].classList.remove("hide-item");
+        items[x].classList.add("show-item");
       }
     }
 
@@ -104,34 +126,41 @@ $(".post").on("click", function (e) {
   formatTextArea(textarea);
   let note = textarea.value;
   if (note) {
-    console.log("You are posting info");
     // post notes to db
     $.ajax({
       type: "POST",
       url: "/notes",
       data: { notes: note },
       success: function (data) {
-        console.log("You are getting info");
-        console.log(data);
-        // get notes from db
         let dArr = [...data.data];
         dArr.forEach((note, index) => {
           if (index == dArr.length - 1) {
+            const icon = document.createElement("i");
             const li_btn2 = document.createElement("button");
             li_btn2.classList.add("text-area-list-container>li>button");
             const li2 = document.createElement("li");
+            li2.setAttribute('id','li'+index+1)
             li2.classList.add("textarea-list-container>li");
-            li2.textContent = note.timestamp + " - " + note.id + ": " + note.notes;
+            icon.classList.add("fa-solid");
+            icon.classList.add("fa-bars");
+            icon.classList.add("drag-elem");
+            // li2.setAttribute('draggable',true)
+            li2.textContent =
+              note.timestamp + " - " + note.id + ": " + note.notes;
             listContainer.append(li2);
             li2.appendChild(li_btn2);
+            li2.appendChild(icon);
             textarea.value = "";
+            li2.addEventListener("mouseover", liHover);
+            li2.addEventListener("mouseout", liOut);
+            listTop.scrollTo(0,listTop.scrollHeight);
           }
         });
         //btn click for deleting a specific note
         return [...listContainer.children].forEach((el, index) => {
           if (index == [...listContainer.children].length - 1) {
             let numId = el.textContent.match(/^\d+/).join``;
-            console.log(numId);
+            // console.log(numId);
             let btn = el.children[0];
             let note = textarea.value;
             const dbId2 = dArr[index].id;
@@ -152,7 +181,6 @@ $(".post").on("click", function (e) {
                   url: `/delete/${dbId2}`,
                 });
               }
-
               listContainer.removeChild(e.target.parentElement);
             });
           }
