@@ -9,6 +9,8 @@ const rootpath = require("path").resolve(__dirname, "../public");
 const PORT = process.env.PORT||3001
 const fastconn = require('../db.js').fastconnection
 
+
+
 // middleware
 fastify.register(fastifyStatic, {
     root: rootpath,
@@ -21,7 +23,10 @@ fastify.register(fastifyView, {
 });
 fastify.register(require('./lib/routes/home.js'))
 fastify.register(require('./lib/routes/notes.js'))
+// fastify.register(require('./lib/routes/abort.js'))
 fastify.register(require('@fastify/postgres'), fastconn.fastPgConnection)
+
+
 
 // lisen on fastify server
 fastify.listen({ port: PORT, host:`127.0.0.1` }, (err, address) => {
@@ -29,7 +34,6 @@ fastify.listen({ port: PORT, host:`127.0.0.1` }, (err, address) => {
     ? listenErr(fastify, err)
     : console.log("fastify server is open on port: " + PORT);
 });
-
 function listenErr(fast, err) {
   console.log('server is not good')
   fast.log.error(err);
