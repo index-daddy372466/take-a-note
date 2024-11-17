@@ -1,5 +1,9 @@
 require('dotenv').config()
 const { Pool } = require('pg')
+// pg string example
+//postgres://user:password@host:port/db
+const fastPgConnection = {connectionString:`postgres://${process.env.DBU}:${process.env.PD}@${process.env.DBH}:${process.env.DBP}/${process.env.DB}`}
+const fastconnection = {fastPgConnection}
 
 const pool = new Pool({
     user: process.env.DBU,
@@ -10,4 +14,4 @@ const pool = new Pool({
 })
 
 
-module.exports = { pool };
+module.exports = { pool, fastconnection };
