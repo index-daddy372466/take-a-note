@@ -1,6 +1,7 @@
 // vars
 const wrapper = document.getElementById('wrapper')
 const textarea = document.getElementById('textarea')
+const listcontainer = document.querySelector('.textarea-list-container')
 const btn = {
   post:document.querySelector('.post'),
   clear:document.getElementById('clear'),
@@ -27,14 +28,25 @@ btn['post'].onclick = async e => {
   controlPostUI(target);
   // clear writingpad
   textarea.value = null;
-  postNoteFn(response,document.querySelector('.textarea-list-container'))
+  postNoteFn(response,listcontainer)
+}
+
+window.onload = async e => {
+  // getFetch('/note')
+  let arr = await getFetch('/note')
+  arr = arr['notes']
+  console.log(arr)
+  arr.forEach(obj=>{
+    const li = document.createElement('li')
+    li.textContent = obj['note'];
+    listcontainer.appendChild(li)
+  })
 }
 
 
 
-
-
 function postNoteFn(note,container){
+note = note.note;
 const li = document.createElement('li')
 li.textContent = note;
 container.appendChild(li)
@@ -79,6 +91,10 @@ async function postFetch(url,obj){
 })
 return response
 }
+async function getFetch(url){
+  const response = await fetch(url).then(r=>r.json()).then(pay=>pay)
+  return response;
+}
 // helper function to format textarea (security)
 const formatTextArea = (textarea) => {
   textarea.value = textarea.value.replace(
@@ -87,3 +103,4 @@ const formatTextArea = (textarea) => {
   );
   return textarea.value
 };
+
