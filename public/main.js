@@ -34,6 +34,7 @@ btn['post'].onclick = async e => {
 window.onload = async e => {
   // getFetch('/note')
   let arr = await getFetch('/note')
+  console.log(arr)
   arr = arr['notes']
   console.log(arr)
   arr.forEach(obj=>{
