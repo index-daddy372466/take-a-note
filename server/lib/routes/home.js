@@ -28,13 +28,11 @@ async function homeroute(fastify, options) {
 
 function checkExistingUsers(fast, id) {
   // check for exisitng users
-  fast.pg.query("select * from users", (err, result) => {
+  fast.pg.query("select * from users where id=$1",[id], (err, result) => {
     if (err) {
       throw new Error(err);
     } else {
-      let currentIds = [...result.rows];
-      const existingUser = currentIds.find((x) => x.id == id) || false;
-      if (!existingUser) {
+      if (!result) {
         console.log('user does not exist')
         return false;
       } else {
