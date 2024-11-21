@@ -1,5 +1,5 @@
 async function notesroute(fastify, options) {
-  // home route
+  // notes route
   fastify.post("/note", async (req, res) => {
     const client = await fastify.pg.connect()
     const { note } = req.body;
@@ -12,9 +12,6 @@ async function notesroute(fastify, options) {
       .header("Content-Type", "application/json; charset=utf-8")
       .send({ note: note });
   });
-
-
-
   fastify.get("/note", async (req, res) => {
     try {
       const client = await fastify.pg.connect()

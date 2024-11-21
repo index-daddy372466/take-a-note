@@ -1,4 +1,5 @@
 // vars
+getList()
 const wrapper = document.getElementById('wrapper')
 const textarea = document.getElementById('textarea')
 const listcontainer = document.querySelector('.textarea-list-container')
@@ -88,24 +89,23 @@ async function postFetch(url,obj){
 return response
 }
 async function getFetch(url){
-  const response = await fetch(url).then(r=>r.text()).then(pay=>pay)
+  const response = await fetch(url).then(r=>r.json()).then(pay=>pay)
   console.log(response)
   return response;
 }
-// async function getList(){
-//   // getFetch('/note')
-//   let arr = JSON.parse(await getFetch('/note'))
-//   arr = arr['notes']||undefined
-//   console.log(arr)
-//   if(!arr){
-//     return null
-//   } else {
-//     arr.forEach(obj=>{
-//       const li = document.createElement('li')
-//       li.textContent = obj['notes']['note'];
-//       listcontainer.appendChild(li)
-//     })
-//   }
-// }
-
+async function getList(){
+  // getFetch('/note')
+  let arr = await getFetch('/note')
+  arr = arr['notes']||undefined
+  console.log(arr)
+  if(!arr){
+    return null
+  } else {
+    arr.forEach(obj=>{
+      const li = document.createElement('li')
+      li.textContent = obj['notes']['note'];
+      listcontainer.appendChild(li)
+    })
+  }
+}
 

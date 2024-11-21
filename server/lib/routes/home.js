@@ -32,7 +32,6 @@ async function homeroute(fastify, options) {
       }
   });
 
-
   // home route
   fastify.get("/", async (req, res) => {
     try{
@@ -45,24 +44,6 @@ async function homeroute(fastify, options) {
   });
 }
 
-async function checkExistingUsers(client, id) {
-  // check for exisitng users
-  let released = await client.query("select * from users where id=$1",[id])
-  client.release()
-  console.log(released.rows)
-}
-async function addUerToDb(client, id) {
-  try {
-    // add user
-    await client.query("insert into users(id) values($1)", [id])
-  } catch (err) {
-    throw new Error(err);
-  }
-}
-async function RemoveFromDb(client,id){
-  // destroy session
-  await client.query('delete from users where id = $1',[id])
-}
 // function checkExpiredUser(fast,id){
 //    // check if user is expired
 //    fast.pg.query('select id from users where id = $1',[id],(err,result)=>{
