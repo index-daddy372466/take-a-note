@@ -15,6 +15,7 @@ const urls = {
 textarea.onfocus = textareaFocus
 textarea.onblur = textareaBlur
 
+
 // post a note on click
 btn['post'].onclick = async e => {
   e.preventDefault();
@@ -31,21 +32,15 @@ btn['post'].onclick = async e => {
   postNoteFn(response,listcontainer)
 }
 
-window.onload = async e => {
-  // getFetch('/note')
-  let arr = await getFetch('/note')
-  console.log(arr)
-  arr = arr['notes']
-  console.log(arr)
-  arr.forEach(obj=>{
-    const li = document.createElement('li')
-    li.textContent = obj['note'];
-    listcontainer.appendChild(li)
-  })
-}
 
-
-
+// helper function to format textarea (security)
+const formatTextArea = (textarea) => {
+  textarea.value = textarea.value.replace(
+    /[;\)\(\_\~\+\=\^\%\$\#\@\!\&\*\|\[\])]/g,
+    ""
+  );
+  return textarea.value
+};
 function postNoteFn(note,container){
 note = note.note;
 const li = document.createElement('li')
@@ -93,15 +88,24 @@ async function postFetch(url,obj){
 return response
 }
 async function getFetch(url){
-  const response = await fetch(url).then(r=>r.json()).then(pay=>pay)
+  const response = await fetch(url).then(r=>r.text()).then(pay=>pay)
+  console.log(response)
   return response;
 }
-// helper function to format textarea (security)
-const formatTextArea = (textarea) => {
-  textarea.value = textarea.value.replace(
-    /[;\)\(\_\~\+\=\^\%\$\#\@\!\&\*\|\[\])]/g,
-    ""
-  );
-  return textarea.value
-};
+// async function getList(){
+//   // getFetch('/note')
+//   let arr = JSON.parse(await getFetch('/note'))
+//   arr = arr['notes']||undefined
+//   console.log(arr)
+//   if(!arr){
+//     return null
+//   } else {
+//     arr.forEach(obj=>{
+//       const li = document.createElement('li')
+//       li.textContent = obj['notes']['note'];
+//       listcontainer.appendChild(li)
+//     })
+//   }
+// }
+
 

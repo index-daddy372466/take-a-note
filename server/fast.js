@@ -30,26 +30,8 @@ fastify.register(require("@fastify/session"), {
 // routes
 fastify.register(require("./lib/routes/home.js"));
 fastify.register(require("./lib/routes/notes.js"));
-// fastify.register(require('./lib/routes/abort.js'))
+fastify.register(require('./lib/routes/abort.js'))
 fastify.register(require("@fastify/postgres"), fastconn.fastPgConnection);
-
-// fastify.addHook('preHandler',(req,res,done)=>{
-//   const bufferId = Buffer.from(Date.now().toString(), "utf-8");
-//   let base64 = bufferId.toString("base64");
-//   // check for exisitng users
-//     try{
-//         req.session['id'] = base64
-//         // addUerToDb(fastify,req.session['id'])
-//         console.log(req.session['id'])
-//     }
-//     catch(err){
-//       throw new Error(err)
-//     }
-//     // add id to database
-//     // addUerToDb(fastify, base64);
-//   // req.session.user = {id:base64}
-//   done()
-// })
 
 // lisen on fastify server
 fastify.listen({ port: PORT, host: `127.0.0.1` }, (err, address) => {
@@ -63,13 +45,4 @@ function listenErr(fast, err) {
   console.log("server is not good");
   fast.log.error(err);
   process.exit(1);
-}
-function addUerToDb(fast, id) {
-  try {
-    fast.pg.query("insert into users(id) values($1)", [id], (err, result) => {
-      return err ? console.log(err) : console.log("user inserted!");
-    });
-  } catch (err) {
-    throw new Error(err);
-  }
 }

@@ -1,16 +1,12 @@
-let notes = [];
 async function notesroute(fastify, options) {
   // home route
   fastify.post("/note", async (req, res) => {
+    const client = await fastify.pg.connect()
     const { note } = req.body;
     // notes.push({note:note,time:Date.now()})
-    fastify.pg.query(
+    await client.query(
       "insert into notepad(notes,user_id) values($1,$2)",
-      [{ note: note }, req.session.user.id],
-      (err, result) => {
-        return err ? console.log(err) : console.log("positive note insert");
-      }
-    );
+      [{ note: note }, req.session.user.id]);
     res
       .code(200)
       .header("Content-Type", "application/json; charset=utf-8")
@@ -18,27 +14,16 @@ async function notesroute(fastify, options) {
   });
 
 
-  let notes
 
   fastify.get("/note", async (req, res) => {
     try {
-      fastify.pg.query(
+      const client = await fastify.pg.connect()
+      const notes = await client.query(
         "select * from notepad where user_id=$1",
-        [req.session.user.id],
-        (err, result) => {
-          if (err) {
-            throw new Error(err);
-          } else {
-            let notes = [...result.rows]
-            console.log(notes)
-          }
-        }
-      );
+        [req.session.user.id])
+      const notesarr = notes.rows;
       res.code(200)
-      .header("Content-Type", "application/json; charset=utf-8")
-      .send({notes:['test',1,false].map(x=>{
-        return {note:x}
-      })})
+      .send({notes:notesarr.length<1 ? undefined : notesarr})
       
     } catch (err) {
       throw new Error(err);
