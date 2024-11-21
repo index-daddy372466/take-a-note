@@ -1,5 +1,11 @@
 // vars
 getList()
+window.onkeydown = e => {
+  if(e.key=='r' && e.ctrlKey){
+    e.preventDefault()
+    }
+}
+
 const wrapper = document.getElementById('wrapper')
 const textarea = document.getElementById('textarea')
 const listcontainer = document.querySelector('.textarea-list-container')
