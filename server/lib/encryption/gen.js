@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
-const modulusLength = 1024,
+const modulusLength = 2048,
 type = 'pkcs1', // public key cryptography
 type2 = 'pkcs8', // private key cryptography
 format = 'pem'

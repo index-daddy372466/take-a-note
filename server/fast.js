@@ -8,6 +8,8 @@ const fastifyStatic = require("@fastify/static");
 const rootpath = require("path").resolve(__dirname, "../public");
 const PORT = process.env.PORT || 3001;
 const fastconn = require("../db.js").fastconnection;
+const publicKey = require('fs').readFileSync(require('path').join(__dirname,'lib/encryption/rsa/id_rsa_pub.pem'),{encoding:'utf8'})
+const crypto = require('crypto')
 
 // middleware
 fastify.register(fastifyStatic, {
@@ -60,6 +62,7 @@ fastify.addHook("preHandler", async (req, res) => {
 // home route
 fastify.get("/", async (req, res) => {
   try{
+    console.log(publicKey)
     return res.viewAsync("index.ejs");
   }
   catch(err){
@@ -72,6 +75,8 @@ fastify.get("/", async (req, res) => {
 fastify.post("/note", async (req, res) => {
   const client = await fastify.pg.connect()
   const { note } = req.body;
+  // test encode note
+  encodeData(note,publicKey,'aes-256-cbc')
   // notes.push({note:note,time:Date.now()})
   await client.query(
     "insert into notepad(notes,user_id) values($1,$2)",
@@ -115,6 +120,13 @@ async function addUerToDb(client, id) {
 async function RemoveFromDb(client,id){
   // destroy session
   await client.query('delete from users where id = $1',[id])
+}
+async function encodeData(data,key,algorithm){
+const iv = crypto.randomBytes(16);
+
+// encode data
+const encode = crypto.createCipheriv(algorithm,key,iv)
+console.log(encode)
 }
 
 
