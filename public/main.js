@@ -1,10 +1,10 @@
 // vars
 getList()
-window.onkeydown = e => {
-  if(e.key=='r' && e.ctrlKey){
-    e.preventDefault()
-    }
-}
+// window.onkeydown = e => {
+//   if(e.key=='r' && e.ctrlKey){
+//     e.preventDefault()
+//     }
+// }
 
 const wrapper = document.getElementById('wrapper')
 const textarea = document.getElementById('textarea')
