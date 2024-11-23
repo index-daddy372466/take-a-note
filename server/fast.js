@@ -56,6 +56,18 @@ fastify.addHook("preHandler", async (req, res) => {
     }
 });
 
+
+// home route
+fastify.get("/", async (req, res) => {
+  try{
+    return res.viewAsync("index.ejs");
+  }
+  catch(err){
+    console.log(err)
+    throw new Error(err)
+  }
+});
+
 // notes route
 fastify.post("/note", async (req, res) => {
   const client = await fastify.pg.connect()
@@ -85,20 +97,6 @@ fastify.get("/note", async (req, res) => {
   }
 });
 
-// routes
-// fastify.register(require("./lib/routes/home.js"));
-// fastify.register(require("./lib/routes/notes.js"));
-
-// home route
-fastify.get("/", async (req, res) => {
-  try{
-    return res.viewAsync("index.ejs");
-  }
-  catch(err){
-    console.log(err)
-    throw new Error(err)
-  }
-});
 async function checkExistingUsers(client, id) {
   // check for exisitng users
   let released = await client.query("select * from users where id=$1",[id])
