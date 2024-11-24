@@ -7,6 +7,7 @@
 
 **Framework**:
 1. NodeJs
+2. Fastify
 
 **Database**:
 1. PostgreSql

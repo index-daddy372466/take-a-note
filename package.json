@@ -4,7 +4,10 @@
   "main": "/server",
   "scripts": {
     "dev": "nodemon server/app.js",
-    "fdev": "nodemon server/fast.js"
+    "fdev":"nodemon server/fast.js",
+    "genkeys": "node server/lib/encryption/gen.js",
+    "cleardb": "node server/lib/abort.js",
+    "unidev": "npm run cleardb;npm run genkeys;npm run fdev"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -22,6 +25,7 @@
     "@fastify/static": "^8.0.2",
     "@fastify/view": "^10.0.1",
     "body-parser": "^1.20.3",
+    "concurrently": "^9.1.0",
     "cookie-session": "^2.1.0",
     "ejs": "^3.1.10",
     "express-session": "^1.18.0",

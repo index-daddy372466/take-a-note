@@ -34,6 +34,7 @@ btn['post'].onclick = async e => {
   const target = e.currentTarget;
   const response = await postFetch(urls['note'],{note:value});
   controlPostUI(target);
+  console.log(response)
   // clear writingpad
   textarea.value = null;
   postNoteFn(response,listcontainer)
@@ -107,9 +108,10 @@ async function getList(){
   if(!arr){
     return null
   } else {
-    arr.forEach(obj=>{
+    arr.forEach(str=>{
       const li = document.createElement('li')
-      li.textContent = obj['notes']['note'];
+      li.textContent = str
+      console.log(li.textContent)
       listcontainer.appendChild(li)
     })
   }

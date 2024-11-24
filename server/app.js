@@ -1,4 +1,4 @@
-require('./lib/dot.js')
+require("dotenv").config();
 // vars
 const cors = require('cors');
 const express = require('express')

@@ -1,4 +1,4 @@
-require("dotenv");
+require("dotenv").config();
 // declare vars
 const fastify = require("fastify")({
   logger: false,
@@ -8,9 +8,19 @@ const fastifyStatic = require("@fastify/static");
 const rootpath = require("path").resolve(__dirname, "../public");
 const PORT = process.env.PORT || 3001;
 const fastconn = require("../db.js").fastconnection;
-const crypto = require('crypto')
-const publicKey = require('fs').readFileSync(require('path').join(__dirname,'lib/encryption/rsa/id_rsa_pub.pem'),{encoding:'utf8'})
-const key = Buffer.alloc(32,crypto.createHmac('sha256',process.env.SECRET).update(publicKey).digest('hex'))
+const {createHmac, randomBytes, createCipheriv, createDecipheriv} = require('crypto')
+const keysExist = require('fs').existsSync(require('path').join(__dirname,'lib/encryption/rsa'))
+let publicKey,key
+if(!keysExist){
+  // require('./lib/writefile.js')('writefile')
+  publicKey = process.env.FAKE_PUBLIC_KEY
+  key = Buffer.alloc(32,createHmac('sha256',process.env.SECRET).update(publicKey).digest('base64'))
+} else {
+  publicKey = require('fs').readFileSync(require('path').join(__dirname,'lib/encryption/rsa/id_rsa_pub.pem'),{encoding:'utf8'})
+  key = Buffer.alloc(32,createHmac('sha256',process.env.SECRET).update(publicKey).digest('base64'))
+}
+
+
 
 // middleware
 fastify.register(fastifyStatic, {
@@ -22,7 +32,6 @@ fastify.register(fastifyView, {
   },
   root: rootpath,
 });
-
 fastify.register(require("@fastify/cookie"));
 fastify.register(require("@fastify/session"), {
   secret: process.env.SECRET1,
@@ -35,7 +44,6 @@ fastify.addHook("preHandler", async (req, res) => {
     const bufferId = Buffer.from(Date.now().toString(), "utf-8");
     let base64 = bufferId.toString("base64");
   // check for exisitng users
-  //  let decodeId = Buffer.from(base64,'base64').toString()
    if(!req.session.user && !(await checkExistingUsers(client,base64))){
     req.session.user = {id:base64,active:true,expired:false}
     addUerToDb(client,base64)
@@ -44,7 +52,7 @@ fastify.addHook("preHandler", async (req, res) => {
    } else {
     console.log('idk what to tell you')
    }
-   
+
    // check expired user
     const id = (req.session.user.id);
     let decodeid = Buffer.from(id,'base64').toString()
@@ -60,6 +68,7 @@ fastify.addHook("preHandler", async (req, res) => {
 });
 
 
+
 // home route
 fastify.get("/", async (req, res) => {
   try{
@@ -70,38 +79,50 @@ fastify.get("/", async (req, res) => {
     throw new Error(err)
   }
 });
-
-// notes route
+// notes post route
 fastify.post("/note", async (req, res) => {
+  req.session.user['vi'] = randomBytes(16).toString('base64')
   const client = await fastify.pg.connect()
   const { note } = req.body;
-  const encryptNote = encodeData(note,key,'aes-256-cbc') // data, key, algorithm
+  const encryptNote = encodeData(note,key,'aes-256-gcm',req.session.user['vi']) // data, key, algorithm
+  console.log(encryptNote)
   // test encode note
   // notes.push({note:note,time:Date.now()})
   await client.query(
     "insert into notepad(notes,user_id) values($1,$2)",
-    [{ note: encryptNote }, req.session.user.id]);
-  res
+    [{ note: encryptNote, iv: req.session.user['vi'].toString() }, req.session.user.id]);
+  if(req.session.user){
+    res
     .code(200)
     .header("Content-Type", "application/json; charset=utf-8")
-    .send({ note: decodeData(encryptNote,key,'aes-256-cbc') });
-});
+    .send({ note: decodeData(encryptNote,key,'aes-256-gcm',req.session.user['vi']) });
+  };
+})
+// notes get route
 fastify.get("/note", async (req, res) => {
   try {
     const client = await fastify.pg.connect()
     const notes = await client.query(
-      "select * from notepad where user_id=$1",
+      "select notes from notepad where user_id=$1",
       [req.session.user.id])
-    const notesarr = notes.rows;
-    res.code(200)
-    .headers('Content-Type/application/json','charset=utf-8')
-    .send({notes:notesarr.length<1 ? undefined : notesarr})
-    
+    // decode the list of encoded notes with it's perspective iv
+    const notesarr = [...notes.rows].map(x=>decodeData(x.notes.note,key,'aes-256-gcm',Buffer.from(x.notes.iv)))
+    if(req.session.user){
+      res.code(200)
+      .headers('Content-Type/application/json','charset=utf-8')
+      .send({notes:notesarr.length<1 ? undefined : notesarr})
+    }
+
   } catch (err) {
     throw new Error(err);
   }
 });
 
+
+
+// functions
+
+// check if user exists by id
 async function checkExistingUsers(client, id) {
   // check for exisitng users
   let released = await client.query("select * from users where id=$1",[id])
@@ -109,6 +130,7 @@ async function checkExistingUsers(client, id) {
   console.log(released.rows)
   return released.rows.length > 0
 }
+// add user to db
 async function addUerToDb(client, id) {
   try {
     // add user
@@ -117,30 +139,38 @@ async function addUerToDb(client, id) {
     throw new Error(err);
   }
 }
+// remove user from db
 async function RemoveFromDb(client,id){
   // destroy session
   await client.query('delete from users where id = $1',[id])
 }
-
-function encodeData(data,key,algorithm){
-  const iv = crypto.randomBytes(16);
+// encrypt data
+function encodeData(data,key,algorithm,iv){
+  console.log('start key encode')
   console.log(key)
+  console.log('end of transmission')
+  console.log(iv)
   // encode data
-  const cipher = crypto.createCipheriv(algorithm,key,iv)
-  console.log(cipher)
+  const cipher = createCipheriv(algorithm,key,iv)
   const encodeData = cipher.update(data,'utf-8','base64') + cipher.final('base64');
   console.log(encodeData)
   return encodeData
 }
-
-async function decodeData(encrypted,key,algorithm){
+// decrypt data
+function decodeData(data,key,algorithm,iv){
   // decode data
-  const iv = crypto.randomBytes(16)
-  const decipher = crypto.createDecipheriv(algorithm,key,iv)
-  let decodedData = decipher.update(Buffer.from(encrypted,'base64'),'utf-8')
-  decodedData = Buffer.from(decodedData)
-  console.log(decodedData)
-  return decodedData
+  console.log('start key decode')
+  console.log(key)
+  console.log('iv for decode')
+  console.log(iv)
+  console.log('end of transmission')
+  const decipher = createDecipheriv(algorithm,key,iv)
+  console.log('help with this:')
+  console.log(decipher)
+  let decodedData = decipher.update(Buffer.from(data, "base64"),"utf-8")
+  console.log('decoded section: ')
+  console.log(decodedData.toString())
+  return decodedData.toString()
 }
 
 
@@ -159,7 +189,7 @@ async function decodeData(encrypted,key,algorithm){
 
 
 
-fastify.register(require('./lib/routes/abort.js'))
+// fastify.register(require('./lib/abort.js'))
 fastify.register(require("@fastify/postgres"), fastconn.fastPgConnection);
 
 // lisen on fastify server
