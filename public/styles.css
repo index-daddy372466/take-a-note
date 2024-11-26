@@ -161,7 +161,7 @@ color:#fff;
     text-align: center;
     justify-content: center;
     gap:3px;
-    transition: .25s;
+    /* transition: .25s; */
 }
 .time-slot > p{
 color:#fff;

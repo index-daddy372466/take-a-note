@@ -119,10 +119,10 @@ function createTimeSlot(arr,container){
 
   // give slot attributes
   slot.classList.add('time-slot')
-  
+  console.log(date)
   // iterate through date and time 
   for(let i = 0; i < arr.length; i++){
-    if(date === arr[i]) arr[i] = shaveYear(arr[i])
+    if(date.includes(arr[i])) arr[i] = shaveYear(arr[i])
     const p = document.createElement('p');
     p.textContent = arr[i];
     slot.appendChild(p)
@@ -132,17 +132,32 @@ function createTimeSlot(arr,container){
 }
 function scrollTopFn(e){
   let ceiling = e.currentTarget.getBoundingClientRect().y
-  console.log(ceiling)
   let ol = e.currentTarget.children[0];
   let lis = [...ol.children];
-  lis.forEach((li,idx)=>{
-    let currY = lis[idx].getBoundingClientRect().y;
-    let slot = li.children[1]
-
-    if(ceiling >= currY){
-      slot.style = `top:${ceiling-25}px`
-    } 
-
-  })  
+  let idx = 0, base = 0, target
+  for(let i = 0; i < lis.length; i++){
+    let scrollLimit = e.currentTarget.scrollTop%lis[idx].clientHeight;
+      let slot = lis[idx].children[1] // .time-slot
+      target = lis[idx]
+      if(ceiling >= (lis[idx].getBoundingClientRect().y + lis[idx].clientHeight) && idx < lis.length){
+        idx+=1
+        target = lis[idx]
+      }
+      if(idx > 0 && (ceiling <= (lis[idx-1].getBoundingClientRect().y + lis[idx-1].clientHeight))){
+        idx-=1
+        target = lis[idx]
+      }
+      if(ceiling >= lis[idx].getBoundingClientRect().y && (ceiling <= lis[idx].getBoundingClientRect().y + lis[idx].clientHeight)) {
+        // method in current li
+        slot.style = `top:${scrollLimit}px`
+      }
+      if(e.currentTarget.scrollTop == base){
+        slot.style = `top:${base}px`
+      }
+      if(target!=lis[i]){
+        let slot = lis[i].children[1]
+        slot.style = `top:${base}px`
+        }
+  }  
 }
 
