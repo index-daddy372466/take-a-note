@@ -79,6 +79,7 @@ fastify.get("/", async (req, res) => {
     throw new Error(err)
   }
 });
+
 // notes post route
 fastify.post("/note", async (req, res) => {
   req.session.user['vi'] = randomBytes(16).toString('base64')
@@ -88,9 +89,10 @@ fastify.post("/note", async (req, res) => {
   console.log(encryptNote)
   // test encode note
   // notes.push({note:note,time:Date.now()})
-  await client.query(
+  let insertnote = await client.query(
     "insert into notepad(notes,user_id) values($1,$2)",
     [{ note: encryptNote, iv: req.session.user['vi'].toString() }, req.session.user.id]);
+    console.log(insertnote)
   if(req.session.user){
     res
     .code(200)

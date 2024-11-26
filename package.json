@@ -4,7 +4,7 @@
   "main": "/server",
   "scripts": {
     "dev": "nodemon server/app.js",
-    "fdev":"nodemon server/fast.js",
+    "fdev": "nodemon server/fast.js",
     "genkeys": "node server/lib/encryption/gen.js",
     "cleardb": "node server/lib/abort.js",
     "unidev": "npm run cleardb;npm run genkeys;npm run fdev"
@@ -27,9 +27,12 @@
     "body-parser": "^1.20.3",
     "concurrently": "^9.1.0",
     "cookie-session": "^2.1.0",
+    "dompurify": "^3.2.1",
     "ejs": "^3.1.10",
     "express-session": "^1.18.0",
     "fastify": "^5.1.0",
+    "isomorphic-dompurify": "^2.17.0",
+    "jsdom": "^25.0.1",
     "keygrip": "^1.1.0",
     "memorystore": "^1.6.7",
     "passport": "^0.7.0",

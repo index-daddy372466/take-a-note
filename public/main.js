@@ -5,7 +5,6 @@ getList()
 //     e.preventDefault()
 //     }
 // }
-
 const wrapper = document.getElementById('wrapper')
 const textarea = document.getElementById('textarea')
 const listcontainer = document.querySelector('.textarea-list-container')
@@ -52,7 +51,9 @@ const formatTextArea = (textarea) => {
 function postNoteFn(note,container){
 note = note.note;
 const li = document.createElement('li')
-li.textContent = note;
+const p = document.createElement('p')
+p.innerHTML = purifyText(note);
+li.appendChild(p)
 container.appendChild(li)
 }
 // timeout to control trigger spam
@@ -110,10 +111,15 @@ async function getList(){
   } else {
     arr.forEach(str=>{
       const li = document.createElement('li')
-      li.textContent = str
-      console.log(li.textContent)
+      const p = document.createElement('p')
+      p.innerHTML = purifyText(str);
+      li.appendChild(p)
       listcontainer.appendChild(li)
     })
   }
 }
-
+// domPurify api
+function purifyText(text){
+  const clean = DOMPurify.sanitize(text)
+  return clean
+}

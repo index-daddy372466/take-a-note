@@ -114,6 +114,7 @@ textarea{
     border-bottom: .5px solid #fff;
     position: relative;
     overflow:hidden;
+    border:2px solid purple;
     transition:.5s;
     width:100%;
     transition:.25s;
@@ -143,20 +144,22 @@ color:#fff;
     z-index:999;
     overflow-x:scroll;
     transition:.25s;
+    border:.5rem solid white;
+    width:100%;
 }
 
 .textarea-list-container{
     transition:.25s;
-    /* border:3px double pink; */
+    border:3px double pink;
     overflow-x:hidden;
     overflow-y:scroll;
     z-index:999;
-    gap:.35rem;
+    /* gap:.35rem; */
     width:100%;
-    display:flex;
+    /* display:flex;
     flex-direction:column;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-evenly; */
     list-style-type: none;
 
 }
