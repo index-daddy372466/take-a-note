@@ -8,17 +8,6 @@ const fastifyStatic = require("@fastify/static");
 const rootpath = require("path").resolve(__dirname, "../public");
 const PORT = process.env.PORT || 3001;
 const fastconn = require("../db.js").fastconnection;
-const {createHmac, randomBytes, createCipheriv, createDecipheriv} = require('crypto')
-const keysExist = require('fs').existsSync(require('path').join(__dirname,'lib/encryption/rsa'))
-let publicKey,key
-if(!keysExist){
-  // require('./lib/writefile.js')('writefile')
-  publicKey = process.env.FAKE_PUBLIC_KEY
-  key = Buffer.alloc(32,createHmac('sha256',process.env.SECRET).update(publicKey).digest('base64'))
-} else {
-  publicKey = require('fs').readFileSync(require('path').join(__dirname,'lib/encryption/rsa/id_rsa_pub.pem'),{encoding:'utf8'})
-  key = Buffer.alloc(32,createHmac('sha256',process.env.SECRET).update(publicKey).digest('base64'))
-}
 
 
 
@@ -55,7 +44,7 @@ fastify.addHook("preHandler", async (req, res) => {
 
    // check expired user
     const id = (req.session.user.id);
-    let decodeid = Buffer.from(id,'base64').toString()
+    let decodeid = id
     let time = new Date(+decodeid).getTime()
     let expires = Math.ceil((Date.now() - time) / 1000);
     let expTime = 1800
@@ -82,22 +71,24 @@ fastify.get("/", async (req, res) => {
 
 // notes post route
 fastify.post("/note", async (req, res) => {
-  req.session.user['vi'] = randomBytes(16).toString('base64')
+  const dateinfo = {
+    date: new Date(Date.now()).toLocaleDateString(),
+    time: new Date(Date.now()).toLocaleTimeString()
+  }
+  // convert object of date info into an array
+  const date = Object.values(dateinfo)
+  console.log(dateinfo)
   const client = await fastify.pg.connect()
   const { note } = req.body;
-  const encryptNote = encodeData(note,key,'aes-256-gcm',req.session.user['vi']) // data, key, algorithm
-  console.log(encryptNote)
-  // test encode note
-  // notes.push({note:note,time:Date.now()})
-  let insertnote = await client.query(
+  await client.query(
     "insert into notepad(notes,user_id) values($1,$2)",
-    [{ note: encryptNote, iv: req.session.user['vi'].toString() }, req.session.user.id]);
-    console.log(insertnote)
+    [note, req.session.user.id]);
+    console.log(note)
   if(req.session.user){
     res
     .code(200)
     .header("Content-Type", "application/json; charset=utf-8")
-    .send({ note: decodeData(encryptNote,key,'aes-256-gcm',req.session.user['vi']) });
+    .send({ note: note, date});
   };
 })
 // notes get route
@@ -105,14 +96,20 @@ fastify.get("/note", async (req, res) => {
   try {
     const client = await fastify.pg.connect()
     const notes = await client.query(
-      "select notes from notepad where user_id=$1",
+      "select notes,timestamp from notepad where user_id=$1",
       [req.session.user.id])
     // decode the list of encoded notes with it's perspective iv
-    const notesarr = [...notes.rows].map(x=>decodeData(x.notes.note,key,'aes-256-gcm',Buffer.from(x.notes.iv)))
+    const notesarr = [...notes.rows].map(x=>{
+      const dateinfo = {
+        date: new Date(x.timestamp).toLocaleDateString(),
+        time: new Date((x.timestamp)).toLocaleTimeString()
+      }
+      return {note:x.notes,timestamp:Object.values(dateinfo)}
+    })
     if(req.session.user){
       res.code(200)
       .headers('Content-Type/application/json','charset=utf-8')
-      .send({notes:notesarr.length<1 ? undefined : notesarr})
+      .send({data:notesarr.length<1 ? undefined : notesarr})
     }
 
   } catch (err) {
@@ -146,34 +143,7 @@ async function RemoveFromDb(client,id){
   // destroy session
   await client.query('delete from users where id = $1',[id])
 }
-// encrypt data
-function encodeData(data,key,algorithm,iv){
-  console.log('start key encode')
-  console.log(key)
-  console.log('end of transmission')
-  console.log(iv)
-  // encode data
-  const cipher = createCipheriv(algorithm,key,iv)
-  const encodeData = cipher.update(data,'utf-8','base64') + cipher.final('base64');
-  console.log(encodeData)
-  return encodeData
-}
-// decrypt data
-function decodeData(data,key,algorithm,iv){
-  // decode data
-  console.log('start key decode')
-  console.log(key)
-  console.log('iv for decode')
-  console.log(iv)
-  console.log('end of transmission')
-  const decipher = createDecipheriv(algorithm,key,iv)
-  console.log('help with this:')
-  console.log(decipher)
-  let decodedData = decipher.update(Buffer.from(data, "base64"),"utf-8")
-  console.log('decoded section: ')
-  console.log(decodedData.toString())
-  return decodedData.toString()
-}
+
 
 
 

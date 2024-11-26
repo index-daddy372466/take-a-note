@@ -7,6 +7,7 @@ getList()
 // }
 const wrapper = document.getElementById('wrapper')
 const textarea = document.getElementById('textarea')
+const textTop = document.getElementById('textarea-top')
 const listcontainer = document.querySelector('.textarea-list-container')
 const btn = {
   post:document.querySelector('.post'),
@@ -17,9 +18,6 @@ const urls = {
   note:'/note',
   delete:'/delete',
 }
-// add focus & blur event listeners
-textarea.onfocus = textareaFocus
-textarea.onblur = textareaBlur
 
 
 // post a note on click
@@ -29,16 +27,16 @@ btn['post'].onclick = async e => {
   if(!value){
     console.log('no value in textarea')
     return null
+  } else {
+    const target = e.currentTarget;
+    const response = await postFetch(urls['note'],{note:value});
+    controlPostUI(target);
+    console.log(response)
+    // clear writingpad
+    textarea.value = null;
+    postNoteFn(response,listcontainer)
   }
-  const target = e.currentTarget;
-  const response = await postFetch(urls['note'],{note:value});
-  controlPostUI(target);
-  console.log(response)
-  // clear writingpad
-  textarea.value = null;
-  postNoteFn(response,listcontainer)
 }
-
 
 // helper function to format textarea (security)
 const formatTextArea = (textarea) => {
@@ -48,13 +46,17 @@ const formatTextArea = (textarea) => {
   );
   return textarea.value
 };
-function postNoteFn(note,container){
-note = note.note;
+function postNoteFn(obj,container){
+const note = obj.note;
+const date = obj.date
 const li = document.createElement('li')
 const p = document.createElement('p')
 p.innerHTML = purifyText(note);
 li.appendChild(p)
 container.appendChild(li)
+createTimeSlot(date,li)
+textTop.onscroll = scrollTopFn
+
 }
 // timeout to control trigger spam
 function controlPostUI(elem){
@@ -65,33 +67,11 @@ setTimeout(()=>{
   elem.disabled = false;
 },1500)
 }
-// trigger textarea focus
-function textareaFocus(e){
-  const elem = e.currentTarget;
-  elem.classList.add('focustext')
-  // toggle wrapper's class to end-focus
-  wrapper.classList.add('end-focus')
-  wrapper.classList.remove('starter-focus')
-}
-// trigger textarea blur
-function textareaBlur(e){
-  const elem = e.currentTarget;
-  elem.classList.remove('focustext')
-  wrapper.classList.add('starter-focus')
-  wrapper.classList.remove('end-focus')
-  // access btn object
-  for(let i in btn){
-    // if buttons are focused, the textarea will remain focused
-    btn[i].onfocus = ev => {
-      elem.classList.add('focustext')
-      wrapper.classList.remove('starter-focus')
-      wrapper.classList.add('end-focus')
-    }
-  }
-}
+
 // post a note to the server
 async function postFetch(url,obj){
  const response = await fetch(url,{headers:{'Content-Type':'application/json'},method:'POST',body:JSON.stringify(obj)}).then(r=>r.json()).then(pay=>{
+  console.log(pay)
   return pay
 })
 return response
@@ -104,22 +84,65 @@ async function getFetch(url){
 async function getList(){
   // getFetch('/note')
   let arr = await getFetch('/note')
-  arr = arr['notes']||undefined
+  console.log(arr)
+  arr = arr['data']||undefined
   console.log(arr)
   if(!arr){
     return null
   } else {
-    arr.forEach(str=>{
+    arr.forEach(obj=>{
+      let str = obj.note, date = obj.timestamp
       const li = document.createElement('li')
       const p = document.createElement('p')
       p.innerHTML = purifyText(str);
       li.appendChild(p)
       listcontainer.appendChild(li)
+      createTimeSlot(date,li)
     })
+    textTop.onscroll = scrollTopFn
   }
+}
+function shaveYear(str){
+  // str = str.split`/`.slice(0,-1).join`/` // remove year
+  str = str.replace(/\/[0-9]{4}$/,'') // remove year
+  return str
 }
 // domPurify api
 function purifyText(text){
   const clean = DOMPurify.sanitize(text)
   return clean
 }
+// function to pull time note was posted
+function createTimeSlot(arr,container){
+  let date = arr.filter(x=>/\//g.test(x)), time = arr.filter(x=>/\:/g.test(x)), slot = document.createElement('div')
+
+
+  // give slot attributes
+  slot.classList.add('time-slot')
+  
+  // iterate through date and time 
+  for(let i = 0; i < arr.length; i++){
+    if(date === arr[i]) arr[i] = shaveYear(arr[i])
+    const p = document.createElement('p');
+    p.textContent = arr[i];
+    slot.appendChild(p)
+  }
+  // append slot to container
+  container.appendChild(slot)
+}
+function scrollTopFn(e){
+  let ceiling = e.currentTarget.getBoundingClientRect().y
+  console.log(ceiling)
+  let ol = e.currentTarget.children[0];
+  let lis = [...ol.children];
+  lis.forEach((li,idx)=>{
+    let currY = lis[idx].getBoundingClientRect().y;
+    let slot = li.children[1]
+
+    if(ceiling >= currY){
+      slot.style = `top:${ceiling-25}px`
+    } 
+
+  })  
+}
+
