@@ -83,11 +83,17 @@ async function postFetch(url,obj){
 })
 return response
 }
+// get notes from server
 async function getFetch(url){
   const response = await fetch(url).then(r=>r.json()).then(pay=>pay)
   console.log(response)
   return response;
 }
+// delete notes on server
+async function deleteFetch(url,data){
+  await fetch(url,{headers:{'Content-Type':'application/json'},method:'DELETE',body:JSON.stringify(data)})
+}
+// display the list of notes
 async function getList(){
   // getFetch('/note')
   let arr = await getFetch('/note')
@@ -116,6 +122,7 @@ async function getList(){
     clearall.onclick = removeAllNotes 
   }
 }
+// remove year from date
 function shaveYear(str){
   // str = str.split`/`.slice(0,-1).join`/` // remove year
   str = str.replace(/\/[0-9]{4}$/,'') // remove year
@@ -126,6 +133,7 @@ function purifyText(text){
   const clean = DOMPurify.sanitize(text)
   return clean
 }
+
 // function to pull time note was posted
 function createTimeSlot(arr,container){
   let date = arr.filter(x=>/\//g.test(x)), time = arr.filter(x=>/\:/g.test(x)), slot = document.createElement('div')
@@ -144,6 +152,7 @@ function createTimeSlot(arr,container){
   // append slot to container
   container.appendChild(slot)
 }
+// scroll fn
 function scrollTopFn(e){
   let ceiling = e.currentTarget.getBoundingClientRect().y
   let ol = e.currentTarget.children[0];
@@ -188,16 +197,16 @@ async function removeNote(e){
     const payload = {text:text}
     const container = li.parentElement;
     container.removeChild(li)
-
-   await fetch('/note',{headers:{'Content-Type':'application/json'},method:'DELETE',body:JSON.stringify(payload)})
-    
+    deleteFetch('/note',payload)    
 }
 async function removeAllNotes(e){
   e.preventDefault()
-  await fetch('/notes',{headers:{'Content-Type':'application/json'},method:'DELETE',body:JSON.stringify({bool:true})})
   const notes = document.querySelectorAll('.textarea-list-container>li');
   const container = document.querySelector('.textarea-list-container')
   for(let i = 0; i < notes.length; i++){
     container.removeChild(notes[i])
   }
+
+  deleteFetch('/notes',{bool:true})
 }
+

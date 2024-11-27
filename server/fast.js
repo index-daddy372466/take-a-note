@@ -31,30 +31,16 @@ fastify.register(()=>methodOverride('_method'))
 fastify.addHook("preHandler", async (req, res) => {
   const client = await fastify.pg.connect();
 
-    const bufferId = Buffer.from(Date.now().toString(), "utf-8");
-    let base64 = bufferId.toString("base64");
+    const dateid = (Date.now().toString());
   // check for exisitng users
-   if(!req.session.user && !(await checkExistingUsers(client,base64))){
-    req.session.user = {id:base64,active:true,expired:false}
-    addUerToDb(client,base64)
+   if(!req.session.user && !(await checkExistingUsers(client,dateid))){
+    req.session.user = {id:dateid,active:true,expired:false}
+    addUerToDb(client,dateid)
    } else if(req.session && (await checkExistingUsers(client,req.session.user.id))){
     console.log('session is active and captured')
    } else {
     console.log('idk what to tell you')
    }
-
-   // check expired user
-    const id = (req.session.user.id);
-    let decodeid = id
-    let time = new Date(+decodeid).getTime()
-    let expires = Math.ceil((Date.now() - time) / 1000);
-    let expTime = 1800
-    if(expires >= expTime){
-      // remove id from db
-      await RemoveFromDb(client,req.session.user['id'])
-      // destroy session
-      req.session.destroy();
-    }
 });
 
 
@@ -140,6 +126,7 @@ fastify.delete('/notes', async (req,res)=> {
   console.log('hitting route to del all notes')
   const userid = req.session.user.id || undefined
   const client = await fastify.pg.connect()
+  console.log(req.body)
   try{
     // check if text and time match a row in notes table
    let delnote = await client.query('delete from notepad where user_id=$1',[userid])
@@ -152,6 +139,39 @@ fastify.delete('/notes', async (req,res)=> {
   }
   })
 
+  // filter users by creation date (id)
+  fastify.get('/api/admin/filter', async(req,res)=>{
+    const client = await fastify.pg.connect()
+    let {from,to,limit} = req.query, query
+
+    try{
+        if(from && !to){
+          from = new Date(`${from}`).getTime()
+          query = await client.query('select * from users where id >= $1',[from])
+        }
+        if(!from && to){
+          to = new Date(`${to}`).getTime()
+          query = await client.query('select * from users where id <= $1',[to])
+        }
+        if(from && to){
+          from = new Date(`${from}`).getTime()
+          to = new Date(`${to}`).getTime()
+          query = await client.query('select * from users where id >= $1 and id <= $2',[from,to])
+        }
+        if(/^(Invalid Date|NaN)$/.test(from)||/^(Invalid Date|NaN)$/.test(to)){
+          res.code(403)
+          .send('Unauthorized')
+        }
+        console.log(from,to,limit)
+        console.log(query.rows)
+        res.code(200)
+        .header("Content-Type", "application/json; charset=utf-8")
+        .send({rows:query.rows});
+    }
+    catch(err){
+      throw new Error(err)
+    }
+  })
 
 
 // functions
@@ -172,11 +192,6 @@ async function addUerToDb(client, id) {
   } catch (err) {
     throw new Error(err);
   }
-}
-// remove user from db
-async function RemoveFromDb(client,id){
-  // destroy session
-  await client.query('delete from users where id = $1',[id])
 }
 
 
