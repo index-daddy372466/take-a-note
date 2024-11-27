@@ -9,6 +9,7 @@ const wrapper = document.getElementById('wrapper')
 const textarea = document.getElementById('textarea')
 const textTop = document.getElementById('textarea-top')
 const listcontainer = document.querySelector('.textarea-list-container')
+const clearall = document.querySelector('.delete')
 const btn = {
   post:document.querySelector('.post'),
   clear:document.getElementById('clear'),
@@ -51,12 +52,18 @@ const note = obj.note;
 const date = obj.date
 const li = document.createElement('li')
 const p = document.createElement('p')
+const del = document.createElement('p')
+del.textContent = 'x';
+del.classList.add('remove-li')
+
 p.innerHTML = purifyText(note);
 li.appendChild(p)
+li.appendChild(del)
 container.appendChild(li)
 createTimeSlot(date,li)
 textTop.onscroll = scrollTopFn
-
+del.onclick = removeNote
+clearall.onclick = removeAllNotes
 }
 // timeout to control trigger spam
 function controlPostUI(elem){
@@ -94,12 +101,19 @@ async function getList(){
       let str = obj.note, date = obj.timestamp
       const li = document.createElement('li')
       const p = document.createElement('p')
+      const del = document.createElement('p')
+      del.textContent = 'x';
+      del.classList.add('remove-li')
+
       p.innerHTML = purifyText(str);
       li.appendChild(p)
+      li.appendChild(del)
       listcontainer.appendChild(li)
       createTimeSlot(date,li)
+      del.onclick = removeNote
     })
     textTop.onscroll = scrollTopFn
+    clearall.onclick = removeAllNotes 
   }
 }
 function shaveYear(str){
@@ -137,7 +151,8 @@ function scrollTopFn(e){
   let idx = 0, base = 0, target
   for(let i = 0; i < lis.length; i++){
     let scrollLimit = e.currentTarget.scrollTop%lis[idx].clientHeight;
-      let slot = lis[idx].children[1] // .time-slot
+      let slot = lis[idx].children[2] // .time-slot
+      let del = lis[idx].children[1] // delete note
       target = lis[idx]
       if(ceiling >= (lis[idx].getBoundingClientRect().y + lis[idx].clientHeight) && idx < lis.length){
         idx+=1
@@ -150,14 +165,39 @@ function scrollTopFn(e){
       if(ceiling >= lis[idx].getBoundingClientRect().y && (ceiling <= lis[idx].getBoundingClientRect().y + lis[idx].clientHeight)) {
         // method in current li
         slot.style = `top:${scrollLimit}px`
+        del.style = `top:${scrollLimit}px`
       }
       if(e.currentTarget.scrollTop == base){
         slot.style = `top:${base}px`
+        del.style = `top:${base}px`
       }
       if(target!=lis[i]){
-        let slot = lis[i].children[1]
+        let slot = lis[i].children[2]
+        let dels = lis[i].children[1]
         slot.style = `top:${base}px`
+        dels.style = `top:${base}px`
         }
   }  
 }
 
+// remove single note/all notes
+async function removeNote(e){
+  // variables
+    const li = e.currentTarget.parentElement;
+    const text = purifyText(li.children[0].textContent)
+    const payload = {text:text}
+    const container = li.parentElement;
+    container.removeChild(li)
+
+   await fetch('/note',{headers:{'Content-Type':'application/json'},method:'DELETE',body:JSON.stringify(payload)})
+    
+}
+async function removeAllNotes(e){
+  e.preventDefault()
+  await fetch('/notes',{headers:{'Content-Type':'application/json'},method:'DELETE',body:JSON.stringify({bool:true})})
+  const notes = document.querySelectorAll('.textarea-list-container>li');
+  const container = document.querySelector('.textarea-list-container')
+  for(let i = 0; i < notes.length; i++){
+    container.removeChild(notes[i])
+  }
+}

@@ -8,7 +8,7 @@ const fastifyStatic = require("@fastify/static");
 const rootpath = require("path").resolve(__dirname, "../public");
 const PORT = process.env.PORT || 3001;
 const fastconn = require("../db.js").fastconnection;
-
+var methodOverride = require('method-override')
 
 
 // middleware
@@ -27,6 +27,7 @@ fastify.register(require("@fastify/session"), {
   cookieName: "sessionId",
   cookie: { maxAge: 1800000, secure: false, httpOnly:true },
 });
+fastify.register(()=>methodOverride('_method'))
 fastify.addHook("preHandler", async (req, res) => {
   const client = await fastify.pg.connect();
 
@@ -116,6 +117,40 @@ fastify.get("/note", async (req, res) => {
     throw new Error(err);
   }
 });
+
+// delete a note
+fastify.delete('/note', async (req,res)=> {
+const {text} = req.body
+const userid = req.session.user.id || undefined
+const client = await fastify.pg.connect()
+try{
+  // check if text and time match a row in notes table
+ let delnote = await client.query('delete from notepad where notes=$1 and user_id=$2',[text,userid])
+  res.code(200)
+  .header("Content-Type", "application/json; charset=utf-8")
+  .send({message:'note deleted'});
+}
+catch(err){
+  throw new Error(err)
+}
+})
+
+// delete all notes by userid
+fastify.delete('/notes', async (req,res)=> {
+  console.log('hitting route to del all notes')
+  const userid = req.session.user.id || undefined
+  const client = await fastify.pg.connect()
+  try{
+    // check if text and time match a row in notes table
+   let delnote = await client.query('delete from notepad where user_id=$1',[userid])
+    res.code(200)
+    .header("Content-Type", "application/json; charset=utf-8")
+    .send({message:'all notes deleted'});
+  }
+  catch(err){
+    throw new Error(err)
+  }
+  })
 
 
 

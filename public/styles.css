@@ -107,6 +107,15 @@ textarea{
     background:pink;
     transition:.5s;
 }
+.remove-li{
+    position:absolute;
+    top:10px;
+    left:10px;
+    color:#fff;
+    cursor:pointer;
+    font-size:18px;
+    z-index:999;
+}
 .no-pointer{
     pointer-events: none;
 }
@@ -126,7 +135,7 @@ textarea{
     flex-wrap:wrap;
     text-align: start;
     list-style: none;
-    z-index: 999;
+    z-index: 998;
 }
 .textarea-list-container>li>p{
     max-width:250px;
@@ -178,6 +187,14 @@ margin-right:.25rem;
     width:100%;
     list-style-type: none;
 
+}
+#title-container{
+    position:fixed;
+    top:25px;
+    left:25px;
+    box-shadow: 0 .5rem 6px .6px #333;
+    border:none;
+    width:500px;
 }
 .hide-item{
     opacity:0;

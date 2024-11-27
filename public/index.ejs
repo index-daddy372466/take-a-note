@@ -18,6 +18,9 @@
     <title>notes App</title>
   </head>
   <body>
+    <div id="title-container">
+      <h1 id="title">Take a Note</h1>
+    </div>
     <div id="wrapper" class="starter-focus">
       <!--notes area-->
       <div id="textarea-container" class="hidden">
@@ -29,7 +32,7 @@
         <form
           class="textarea-form"
           action="/delete"
-          method="POST"
+          method="DELETE"
           id="delete"
         ></form>
         <form class="textarea-form" action="/note" method="POST">
@@ -54,6 +57,5 @@
       </div>
     </div>
   </body>
-
   <script type="module" src="main.js"></script>
 </html>
