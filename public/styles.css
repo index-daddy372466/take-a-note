@@ -139,8 +139,8 @@ textarea{
     list-style: none;
     z-index: 998;
     overflow-y:scroll;
-
 }
+
 .textarea-list-container>li>p{
     max-width:250px;
 }

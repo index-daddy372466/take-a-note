@@ -48,6 +48,7 @@ const formatTextArea = (textarea) => {
   return textarea.value
 };
 function postNoteFn(obj,container){
+textarea.focus()
 const note = obj.note;
 const date = obj.date
 const li = document.createElement('li')
@@ -223,6 +224,7 @@ async function removeNote(e){
 }
 async function removeAllNotes(e){
   e.preventDefault()
+  textarea.focus()
   const notes = document.querySelectorAll('.textarea-list-container>li');
   const container = document.querySelector('.textarea-list-container')
   for(let i = 0; i < notes.length; i++){

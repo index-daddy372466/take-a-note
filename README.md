@@ -1,16 +1,16 @@
 # Case Study: Take a Note
-<img src="./images/desktop.png"/>
+<img src="./media/helloworld.jpg"/>
 
 ## Description
 
-- The focus of this case study is on mock website, _Shaggy Secrets_.
-While the Desktop View seems readable & easy to navigate, its mobile counterpart can be improved.
+- The focus of this case study is on a basic note-taking module, _Take a Note_, where security can be improved. Users wants to feel safe knowing their personal data is posted & saved in a secure database. This application will delve into encrypting/decrypting data within the server before __posting__ to the database & __getting__ information from the database respectively.
+
 
 ### Issue:
 
-1. #### Data is displayed as plain-text inside database <br>
+1. #### Data is displayed as plain-text inside database, including the user's id (Date time) <br>
 
-<img src="./images/problemissue.jpg" height="350"/>
+<img src="./media/caseproblem.jpg"/>
 
 **Description**: <br> Notice how the navigation is reduced in size compared to the desktop view above. The first navigation link, "What we Offer" seems to overlap the logo. Just like our navigation list-items, the logo is covered by an article tag that ulitmately refreshes the page.
 
