@@ -140,23 +140,25 @@ fastify.delete('/notes', async (req,res)=> {
   })
 
   // filter users by creation date (id)
-  fastify.get('/api/admin/filter', async(req,res)=>{
+  fastify.get('/api/admin/filter/:table', async(req,res)=>{
     const client = await fastify.pg.connect()
+    const {table} = req.params
     let {from,to,limit} = req.query, query
-
+    let column = /users/.test(table) ? 'id' : /notepad/.test(table) ? 'timestamp' : undefined;
+    
     try{
         if(from && !to){
           from = new Date(`${from}`).getTime()
-          query = await client.query('select * from users where id >= $1',[from])
+          query = await client.query(`select * from ${table} where ${column} >= $1`,[from])
         }
         if(!from && to){
           to = new Date(`${to}`).getTime()
-          query = await client.query('select * from users where id <= $1',[to])
+          query = await client.query(`select * from ${table} where ${column} <= $1`,[to])
         }
         if(from && to){
           from = new Date(`${from}`).getTime()
           to = new Date(`${to}`).getTime()
-          query = await client.query('select * from users where id >= $1 and id <= $2',[from,to])
+          query = await client.query(`select * from ${table} where ${column} >= $1 and ${column} <= $2`,[from,to])
         }
         if(/^(Invalid Date|NaN)$/.test(from)||/^(Invalid Date|NaN)$/.test(to)){
           res.code(403)

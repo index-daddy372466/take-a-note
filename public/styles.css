@@ -127,6 +127,7 @@ textarea{
     width:100%;
     transition:.25s;
     max-width:500px;
+    height:100px;
     display:flex;
     font-size:16px;
     align-items: center;
@@ -134,8 +135,11 @@ textarea{
     padding:2.5rem .75rem 1rem 1.5rem;
     flex-wrap:wrap;
     text-align: start;
+    /* border:4px solid purple; */
     list-style: none;
     z-index: 998;
+    overflow-y:scroll;
+
 }
 .textarea-list-container>li>p{
     max-width:250px;

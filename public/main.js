@@ -64,13 +64,18 @@ createTimeSlot(date,li)
 textTop.onscroll = scrollTopFn
 del.onclick = removeNote
 clearall.onclick = removeAllNotes
+const items = document.querySelectorAll('.textarea-list-container>li')
+    items.forEach((item,idx)=>{
+      // scrolltop fn to each item
+      item.onscroll = scrollTopFn
+    })
 }
 // timeout to control trigger spam
 function controlPostUI(elem){
   elem.classList.add('no-pointer')
   elem.setAttribute('disabled',true)
 setTimeout(()=>{
-  elem.classList.remove('no-pointer') 
+  elem.classList.remove('no-pointer')
   elem.disabled = false;
 },1500)
 }
@@ -119,7 +124,12 @@ async function getList(){
       del.onclick = removeNote
     })
     textTop.onscroll = scrollTopFn
-    clearall.onclick = removeAllNotes 
+    clearall.onclick = removeAllNotes
+    const items = document.querySelectorAll('.textarea-list-container>li')
+    items.forEach((item,idx)=>{
+      // scrolltop fn to each item
+      item.onscroll = scrollTopFn
+    })
   }
 }
 // remove year from date
@@ -142,7 +152,7 @@ function createTimeSlot(arr,container){
   // give slot attributes
   slot.classList.add('time-slot')
   console.log(date)
-  // iterate through date and time 
+  // iterate through date and time
   for(let i = 0; i < arr.length; i++){
     if(date.includes(arr[i])) arr[i] = shaveYear(arr[i])
     const p = document.createElement('p');
@@ -152,25 +162,36 @@ function createTimeSlot(arr,container){
   // append slot to container
   container.appendChild(slot)
 }
+let scrollDir = []
 // scroll fn
 function scrollTopFn(e){
   let ceiling = e.currentTarget.getBoundingClientRect().y
   let ol = e.currentTarget.children[0];
   let lis = [...ol.children];
   let idx = 0, base = 0, target
+  let control = 1;
+  // let scrollLimit = e.currentTarget.scrollTop
+  // scrollDir.push(scrollLimit)
+  // scrollDir = scrollDir.slice(-2)
   for(let i = 0; i < lis.length; i++){
-    let scrollLimit = e.currentTarget.scrollTop%lis[idx].clientHeight;
+  let scrollLimit = e.currentTarget.scrollTop % lis[idx].clientHeight
+  
       let slot = lis[idx].children[2] // .time-slot
       let del = lis[idx].children[1] // delete note
       target = lis[idx]
-      if(ceiling >= (lis[idx].getBoundingClientRect().y + lis[idx].clientHeight) && idx < lis.length){
+      // if ceiling is scrolled [DOWN] past the END of li & we are not on the last li
+      if(ceiling > (lis[idx].getBoundingClientRect().y + lis[idx].clientHeight) && idx < lis.length){
+        console.log('over li - down')
         idx+=1
         target = lis[idx]
       }
+      // if ceiling is scrolled [UP] past the END of [PREVIOUS] li & we are not on the first li
       if(idx > 0 && (ceiling <= (lis[idx-1].getBoundingClientRect().y + lis[idx-1].clientHeight))){
+        console.log('over li - up')
         idx-=1
         target = lis[idx]
       }
+      // if ceiling is between indexed li
       if(ceiling >= lis[idx].getBoundingClientRect().y && (ceiling <= lis[idx].getBoundingClientRect().y + lis[idx].clientHeight)) {
         // method in current li
         slot.style = `top:${scrollLimit}px`
@@ -186,7 +207,8 @@ function scrollTopFn(e){
         slot.style = `top:${base}px`
         dels.style = `top:${base}px`
         }
-  }  
+        console.log(scrollLimit)
+  }
 }
 
 // remove single note/all notes
@@ -197,7 +219,7 @@ async function removeNote(e){
     const payload = {text:text}
     const container = li.parentElement;
     container.removeChild(li)
-    deleteFetch('/note',payload)    
+    deleteFetch('/note',payload)
 }
 async function removeAllNotes(e){
   e.preventDefault()

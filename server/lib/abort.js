@@ -5,6 +5,10 @@ const {pool} = require('../../db.js')
 const cleardb = async () => {
     try{
         await pool.query('truncate users,notepad cascade; alter sequence notepad_id_seq restart with 1')
+        process.nextTick(()=>{
+            console.log('db cleared successfully')
+            process.exit(0)
+        })
     }
     catch(err){
         console.log(err)
