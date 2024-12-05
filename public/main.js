@@ -10,6 +10,7 @@ const textarea = document.getElementById('textarea')
 const textTop = document.getElementById('textarea-top')
 const listcontainer = document.querySelector('.textarea-list-container')
 const clearall = document.querySelector('.delete')
+const filterbtn = document.getElementById('filter-button')
 const btn = {
   post:document.querySelector('.post'),
   clear:document.getElementById('clear'),
@@ -58,11 +59,13 @@ del.textContent = 'x';
 del.classList.add('remove-li')
 
 p.innerHTML = purifyText(note);
+// p.innerHTML = (note);
 li.appendChild(p)
 li.appendChild(del)
 container.appendChild(li)
 createTimeSlot(date,li)
 textTop.onscroll = scrollTopFn
+document.getElementById('filterid').oninput = filternotes
 del.onclick = removeNote
 clearall.onclick = removeAllNotes
 const items = document.querySelectorAll('.textarea-list-container>li')
@@ -118,6 +121,7 @@ async function getList(){
       del.classList.add('remove-li')
 
       p.innerHTML = purifyText(str);
+      // p.innerHTML = (str);
       li.appendChild(p)
       li.appendChild(del)
       listcontainer.appendChild(li)
@@ -131,6 +135,8 @@ async function getList(){
       // scrolltop fn to each item
       item.onscroll = scrollTopFn
     })
+  document.getElementById('filterid').oninput = filternotes
+
   }
 }
 // remove year from date
@@ -164,36 +170,27 @@ function createTimeSlot(arr,container){
   container.appendChild(slot)
 }
 let scrollDir = []
+const filtercontainer = document.getElementById('filter-container')
 // scroll fn
 function scrollTopFn(e){
   let ceiling = e.currentTarget.getBoundingClientRect().y
-  let ol = e.currentTarget.children[0];
-  let lis = [...ol.children];
+  let ol = e.currentTarget.children[1]; // ul
+  let lis = [...ol.children] // [li,li,li]
   let idx = 0, base = 0, target
-  let control = 1;
-  // let scrollLimit = e.currentTarget.scrollTop
-  // scrollDir.push(scrollLimit)
-  // scrollDir = scrollDir.slice(-2)
   for(let i = 0; i < lis.length; i++){
-  let scrollLimit = e.currentTarget.scrollTop % lis[idx].clientHeight
-  
+  let scrollLimit = (e.currentTarget.scrollTop - filtercontainer.clientHeight) % lis[idx].clientHeight
       let slot = lis[idx].children[2] // .time-slot
       let del = lis[idx].children[1] // delete note
-      target = lis[idx]
       // if ceiling is scrolled [DOWN] past the END of li & we are not on the last li
       if(ceiling > (lis[idx].getBoundingClientRect().y + lis[idx].clientHeight) && idx < lis.length){
         console.log('over li - down')
         idx+=1
         target = lis[idx]
       }
-      // if ceiling is scrolled [UP] past the END of [PREVIOUS] li & we are not on the first li
-      if(idx > 0 && (ceiling <= (lis[idx-1].getBoundingClientRect().y + lis[idx-1].clientHeight))){
-        console.log('over li - up')
-        idx-=1
-        target = lis[idx]
-      }
+
+      
       // if ceiling is between indexed li
-      if(ceiling >= lis[idx].getBoundingClientRect().y && (ceiling <= lis[idx].getBoundingClientRect().y + lis[idx].clientHeight)) {
+      if((ceiling >= lis[idx].getBoundingClientRect().y && ceiling <= (lis[idx].getBoundingClientRect().y + lis[idx].clientHeight))) {
         // method in current li
         slot.style = `top:${scrollLimit}px`
         del.style = `top:${scrollLimit}px`
@@ -208,8 +205,8 @@ function scrollTopFn(e){
         slot.style = `top:${base}px`
         dels.style = `top:${base}px`
         }
-        console.log(scrollLimit)
   }
+  document.getElementById('filterid').oninput = filternotes
 }
 
 // remove single note/all notes
@@ -217,12 +214,14 @@ async function removeNote(e){
   // variables
     const li = e.currentTarget.parentElement;
     const text = purifyText(li.children[0].textContent)
+    // const text = (li.children[0].textContent)
     const payload = {text:text}
     const container = li.parentElement;
     container.removeChild(li)
     deleteFetch('/note',payload)
 }
 async function removeAllNotes(e){
+  
   e.preventDefault()
   textarea.focus()
   const notes = document.querySelectorAll('.textarea-list-container>li');
@@ -233,4 +232,43 @@ async function removeAllNotes(e){
 
   deleteFetch('/notes',{bool:true})
 }
+// filter toggle with filter button
+const toggleFilter = e => {
+  const showfilter = 'show-filter',
+      hidefilter = 'hide-filter',
+      btndown = 'translateButnDwn',
+      btnup = 'translateButnUp'
+  const target = e.currentTarget;
+  const input = document.querySelector('#filterid')
+  if(!input.classList.contains(showfilter) && listcontainer.children.length > 0){
+    input.classList.remove(hidefilter)
+    input.focus()
+    input.classList.add(showfilter)
+    target.classList.add(btndown)
+    target.classList.remove(btnup)
 
+  } else {
+    input.classList.remove(showfilter)
+    input.classList.add(hidefilter)
+    target.classList.add(btnup)
+    target.classList.remove(btndown)
+  }
+  console.log(document.querySelector('#filterid'))
+}
+filterbtn.onclick = toggleFilter;
+
+// filter notes
+const filternotes = async e => {
+  let input = e.currentTarget;
+  let updateregex = input.value
+  const regexp = new RegExp(updateregex,'gi')
+  // fetch notes
+  let list = await getFetch('/note')
+  // store notes in array
+  let arr = list.data
+  // filter through fetched array
+  let filtered = arr.filter(x=>{
+    return regexp.test(x.note)
+  })
+  console.log(filtered)
+}

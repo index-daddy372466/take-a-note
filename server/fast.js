@@ -60,16 +60,18 @@ fastify.get("/", async (req, res) => {
 fastify.post("/note", async (req, res) => {
   const dateinfo = {
     date: new Date(Date.now()).toLocaleDateString(),
-    time: new Date(Date.now()).toLocaleTimeString()
+    time: new Date(Date.now()).toLocaleTimeString(),
+    unix: Date.now()
   }
   // convert object of date info into an array
-  const date = Object.values(dateinfo)
+  const date = Object.values(dateinfo).filter(x=>typeof(x)!=='number' && /\d*/.test(x))
+  console.log(date)
   console.log(dateinfo)
   const client = await fastify.pg.connect()
   const { note } = req.body;
   await client.query(
-    "insert into notepad(notes,user_id) values($1,$2)",
-    [note, req.session.user.id]);
+    "insert into notepad(notes,user_id,unix) values($1,$2,$3)",
+    [note, req.session.user.id,dateinfo.unix]);
     console.log(note)
   if(req.session.user){
     res
@@ -138,32 +140,34 @@ fastify.delete('/notes', async (req,res)=> {
     throw new Error(err)
   }
   })
-
   // filter users by creation date (id)
-  fastify.get('/api/admin/filter/:table', async(req,res)=>{
+  fastify.get('/api/admin/filter/:table/:column', async(req,res)=>{
     const client = await fastify.pg.connect()
-    const {table} = req.params
+    const {table,column} = req.params
+    console.log(req.params)
     let {from,to,limit} = req.query, query
-    let column = /users/.test(table) ? 'id' : /notepad/.test(table) ? 'timestamp' : undefined;
+    // let column = /users/.test(table) ? 'id' : /notepad/.test(table) ? 'timestamp' : undefined;
     
     try{
         if(from && !to){
-          from = new Date(`${from}`).getTime()
+          // from = new Date(`${from}`).getTime()
           query = await client.query(`select * from ${table} where ${column} >= $1`,[from])
         }
         if(!from && to){
-          to = new Date(`${to}`).getTime()
-          query = await client.query(`select * from ${table} where ${column} <= $1`,[to])
+          // to = new Date(`${to}`).getTime()
+          query = await client.query(`select * from ${table} where ${column} <= $1`,[+to])
+          console.log('WTF!!!')
+          console.log(to)
         }
         if(from && to){
-          from = new Date(`${from}`).getTime()
-          to = new Date(`${to}`).getTime()
+          // from = new Date(`${from}`).getTime()
+          // to = new Date(`${to}`).getTime()
           query = await client.query(`select * from ${table} where ${column} >= $1 and ${column} <= $2`,[from,to])
         }
-        if(/^(Invalid Date|NaN)$/.test(from)||/^(Invalid Date|NaN)$/.test(to)){
-          res.code(403)
-          .send('Unauthorized')
-        }
+        // if(/^(Invalid Date|NaN)$/.test(from)||/^(Invalid Date|NaN)$/.test(to)){
+        //   res.code(403)
+        //   .send('Unauthorized')
+        // }
         console.log(from,to,limit)
         console.log(query.rows)
         res.code(200)
@@ -171,6 +175,7 @@ fastify.delete('/notes', async (req,res)=> {
         .send({rows:query.rows});
     }
     catch(err){
+      console.log(err)
       throw new Error(err)
     }
   })
