@@ -156,7 +156,6 @@ color:#fff;
     z-index:998;
     overflow-y:scroll;
     transition:.25s;
-    border:.5rem solid white;
     width:100%;
     min-height:0;
     max-height:25vh;
@@ -199,19 +198,23 @@ background:white;
 #filterid{
     position:absolute;
     z-index:999;
-    transition: .25s;
     outline:none;
     width:50%;
     border-radius: 0 0 12px 12px;
     border:none;
     padding: .25rem;
+    border-top:4px solid #000;
     font-size:16px;
     }
 .hide-filter{
-    top:-100px;
+    top:-200px;
 }
 .show-filter{
     top:0px;
+}
+.hide-li{
+    display:none;
+    opacity: 0;
 }
 .time-slot{
     height:35px;
@@ -235,7 +238,6 @@ margin-right:.25rem;
 }
 .textarea-list-container{
     transition:.25s;
-    border:3px double pink;
     overflow-x:hidden;
     position: relative;
     overflow-y:scroll;

@@ -1,5 +1,4 @@
 // vars
-getList()
 // window.onkeydown = e => {
 //   if(e.key=='r' && e.ctrlKey){
 //     e.preventDefault()
@@ -11,6 +10,7 @@ const textTop = document.getElementById('textarea-top')
 const listcontainer = document.querySelector('.textarea-list-container')
 const clearall = document.querySelector('.delete')
 const filterbtn = document.getElementById('filter-button')
+const filtercontainer = document.getElementById('filter-container')
 const btn = {
   post:document.querySelector('.post'),
   clear:document.getElementById('clear'),
@@ -20,6 +20,7 @@ const urls = {
   note:'/note',
   delete:'/delete',
 }
+getList(urls.note)
 
 
 // post a note on click
@@ -39,9 +40,11 @@ btn['post'].onclick = async e => {
     postNoteFn(response,listcontainer)
   }
 }
+// toggle filter button
+filterbtn.onclick = toggleFilter;
 
 // helper function to format textarea (security)
-const formatTextArea = (textarea) => {
+function formatTextArea(textarea){
   textarea.value = textarea.value.replace(
     /[;\)\(\_\~\+\=\^\%\$\#\@\!\&\*\|\[\])]/g,
     ""
@@ -81,7 +84,7 @@ function controlPostUI(elem){
 setTimeout(()=>{
   elem.classList.remove('no-pointer')
   elem.disabled = false;
-},1500)
+},500)
 }
 
 // post a note to the server
@@ -103,9 +106,10 @@ async function deleteFetch(url,data){
   await fetch(url,{headers:{'Content-Type':'application/json'},method:'DELETE',body:JSON.stringify(data)})
 }
 // display the list of notes
-async function getList(){
+async function getList(url){
+// clear list before fetch
   // getFetch('/note')
-  let arr = await getFetch('/note')
+  let arr = await getFetch(url)
   console.log(arr)
   arr = arr['data']||undefined
   console.log(arr)
@@ -125,6 +129,7 @@ async function getList(){
       li.appendChild(p)
       li.appendChild(del)
       listcontainer.appendChild(li)
+      console.log(date)
       createTimeSlot(date,li)
       del.onclick = removeNote
     })
@@ -150,7 +155,6 @@ function purifyText(text){
   const clean = DOMPurify.sanitize(text)
   return clean
 }
-
 // function to pull time note was posted
 function createTimeSlot(arr,container){
   let date = arr.filter(x=>/\//g.test(x)), time = arr.filter(x=>/\:/g.test(x)), slot = document.createElement('div')
@@ -169,8 +173,6 @@ function createTimeSlot(arr,container){
   // append slot to container
   container.appendChild(slot)
 }
-let scrollDir = []
-const filtercontainer = document.getElementById('filter-container')
 // scroll fn
 function scrollTopFn(e){
   let ceiling = e.currentTarget.getBoundingClientRect().y
@@ -208,7 +210,6 @@ function scrollTopFn(e){
   }
   document.getElementById('filterid').oninput = filternotes
 }
-
 // remove single note/all notes
 async function removeNote(e){
   // variables
@@ -233,7 +234,7 @@ async function removeAllNotes(e){
   deleteFetch('/notes',{bool:true})
 }
 // filter toggle with filter button
-const toggleFilter = e => {
+function toggleFilter(e){
   const showfilter = 'show-filter',
       hidefilter = 'hide-filter',
       btndown = 'translateButnDwn',
@@ -255,20 +256,17 @@ const toggleFilter = e => {
   }
   console.log(document.querySelector('#filterid'))
 }
-filterbtn.onclick = toggleFilter;
-
 // filter notes
-const filternotes = async e => {
+async function filternotes(e){
+  let hide = 'hide-li'
   let input = e.currentTarget;
   let updateregex = input.value
+  const children = [...document.querySelector('.textarea-list-container').children]
   const regexp = new RegExp(updateregex,'gi')
-  // fetch notes
-  let list = await getFetch('/note')
-  // store notes in array
-  let arr = list.data
-  // filter through fetched array
-  let filtered = arr.filter(x=>{
-    return regexp.test(x.note)
-  })
-  console.log(filtered)
+  // filter notes
+  console.log(regexp)
+  children.filter(ch=>regexp.test(ch.children[0].textContent) ? ch.style='display:block' : ch.style='display:none')
+  console.log(children)
+  
+
 }

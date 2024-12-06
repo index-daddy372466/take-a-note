@@ -105,6 +105,34 @@ fastify.get("/note", async (req, res) => {
     throw new Error(err);
   }
 });
+// filter through notes
+fastify.get("/filter/:note", async (req, res) => {
+  const {note} = req.params
+  try {
+    const client = await fastify.pg.connect()
+    console.log(note)
+    const id = req.session.user.id
+    let relnotes = await client.query('select * from notepad where user_id = $1 and notes ~~* $2',[id,`%${note}%`])
+    let relnotesv2 = relnotes.rows.map(x=>{
+      const dateinfo = {
+        date: new Date(x.timestamp).toLocaleDateString(),
+        time: new Date((x.timestamp)).toLocaleTimeString()
+      }
+      return{note:x.notes,timestamp:Object.values(dateinfo)}
+    });
+    
+    console.log(relnotesv2)
+    if(req.session.user){
+      res.code(200)
+      .headers('Content-Type/application/json','charset=utf-8')
+      .send({data:relnotesv2})
+    }
+
+  } catch (err) {
+    console.log(err)
+    throw new Error(err);
+  }
+});
 
 // delete a note
 fastify.delete('/note', async (req,res)=> {
