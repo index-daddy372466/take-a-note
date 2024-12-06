@@ -60,6 +60,7 @@ function formatTextArea(textarea){
   return textarea.value
 };
 function postNoteFn(obj,container){
+  filterbtn.classList.remove('no-pointer')
 textarea.focus()
 const note = obj.note;
 const date = obj.date
@@ -230,8 +231,16 @@ async function removeNote(e){
     container.removeChild(li)
     deleteFetch('/note',payload)
     // if client has 1 note
+    const btndown = 'translateButnDwn',
+      btnup = 'translateButnUp'
     if(document.querySelectorAll('.textarea-list-container>li').length<1){
       filterbtn.classList.add('make-transparent')
+      filterbtn.classList.add('no-pointer')
+      filterbtn.classList.add(btnup)
+      filterbtn.classList.remove(btndown)
+      input.classList.remove('show-filter')
+      input.classList.add('hide-filter')
+      
     }
 }
 async function removeAllNotes(e){
@@ -285,8 +294,14 @@ async function filternotes(e){
 }
 // keydown function
 function keydownFn(e){
-  if(document.querySelectorAll('.textarea-list-container>li').length<=0)filterbtn.classList.add('make-transparent')
+  if(document.querySelectorAll('.textarea-list-container>li').length<=0){
+    filterbtn.classList.add('no-pointer')
+    filterbtn.classList.add('make-transparent')
+  }
 }
 function mouseOverFilterBtn(e){
-  if(document.querySelectorAll('.textarea-list-container>li').length>0)e.currentTarget.classList.remove('make-transparent');
+  if(document.querySelectorAll('.textarea-list-container>li').length>0){
+    filterbtn.classList.remove('no-pointer')
+    e.currentTarget.classList.remove('make-transparent');
+  }
 }
