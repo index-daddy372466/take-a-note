@@ -55,7 +55,6 @@ fastify.get("/", async (req, res) => {
     throw new Error(err)
   }
 });
-
 // notes post route
 fastify.post("/note", async (req, res) => {
   const dateinfo = {
@@ -133,7 +132,6 @@ fastify.get("/filter/:note", async (req, res) => {
     throw new Error(err);
   }
 });
-
 // delete a note
 fastify.delete('/note', async (req,res)=> {
 const {text} = req.body
@@ -150,7 +148,6 @@ catch(err){
   throw new Error(err)
 }
 })
-
 // delete all notes by userid
 fastify.delete('/notes', async (req,res)=> {
   console.log('hitting route to del all notes')
@@ -167,46 +164,46 @@ fastify.delete('/notes', async (req,res)=> {
   catch(err){
     throw new Error(err)
   }
-  })
-  // filter users by creation date (id)
-  fastify.get('/api/admin/filter/:table/:column', async(req,res)=>{
-    const client = await fastify.pg.connect()
-    const {table,column} = req.params
-    console.log(req.params)
-    let {from,to,limit} = req.query, query
-    // let column = /users/.test(table) ? 'id' : /notepad/.test(table) ? 'timestamp' : undefined;
-    
-    try{
-        if(from && !to){
-          // from = new Date(`${from}`).getTime()
-          query = await client.query(`select * from ${table} where ${column} >= $1`,[from])
-        }
-        if(!from && to){
-          // to = new Date(`${to}`).getTime()
-          query = await client.query(`select * from ${table} where ${column} <= $1`,[+to])
-          console.log('WTF!!!')
-          console.log(to)
-        }
-        if(from && to){
-          // from = new Date(`${from}`).getTime()
-          // to = new Date(`${to}`).getTime()
-          query = await client.query(`select * from ${table} where ${column} >= $1 and ${column} <= $2`,[from,to])
-        }
-        // if(/^(Invalid Date|NaN)$/.test(from)||/^(Invalid Date|NaN)$/.test(to)){
-        //   res.code(403)
-        //   .send('Unauthorized')
-        // }
-        console.log(from,to,limit)
-        console.log(query.rows)
-        res.code(200)
-        .header("Content-Type", "application/json; charset=utf-8")
-        .send({rows:query.rows});
-    }
-    catch(err){
-      console.log(err)
-      throw new Error(err)
-    }
-  })
+})
+// filter users by creation date (id)
+fastify.get('/api/admin/filter/:table/:column', async(req,res)=>{
+  const client = await fastify.pg.connect()
+  const {table,column} = req.params
+  console.log(req.params)
+  let {from,to,limit} = req.query, query
+  // let column = /users/.test(table) ? 'id' : /notepad/.test(table) ? 'timestamp' : undefined;
+  
+  try{
+      if(from && !to){
+        // from = new Date(`${from}`).getTime()
+        query = await client.query(`select * from ${table} where ${column} >= $1`,[from])
+      }
+      if(!from && to){
+        // to = new Date(`${to}`).getTime()
+        query = await client.query(`select * from ${table} where ${column} <= $1`,[+to])
+        console.log('WTF!!!')
+        console.log(to)
+      }
+      if(from && to){
+        // from = new Date(`${from}`).getTime()
+        // to = new Date(`${to}`).getTime()
+        query = await client.query(`select * from ${table} where ${column} >= $1 and ${column} <= $2`,[from,to])
+      }
+      // if(/^(Invalid Date|NaN)$/.test(from)||/^(Invalid Date|NaN)$/.test(to)){
+      //   res.code(403)
+      //   .send('Unauthorized')
+      // }
+      console.log(from,to,limit)
+      console.log(query.rows)
+      res.code(200)
+      .header("Content-Type", "application/json; charset=utf-8")
+      .send({rows:query.rows});
+  }
+  catch(err){
+    console.log(err)
+    throw new Error(err)
+  }
+})
 
 
 // functions

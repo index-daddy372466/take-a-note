@@ -11,6 +11,7 @@ const listcontainer = document.querySelector('.textarea-list-container')
 const clearall = document.querySelector('.delete')
 const filterbtn = document.getElementById('filter-button')
 const filtercontainer = document.getElementById('filter-container')
+const input = document.querySelector('#filterid')
 const btn = {
   post:document.querySelector('.post'),
   clear:document.getElementById('clear'),
@@ -42,6 +43,13 @@ btn['post'].onclick = async e => {
 }
 // toggle filter button
 filterbtn.onclick = toggleFilter;
+// make filter button known if notes are available
+filterbtn.onmouseenter = mouseOverFilterBtn
+// key down event listener on textarea
+textarea.onkeydown = keydownFn
+
+
+
 
 // helper function to format textarea (security)
 function formatTextArea(textarea){
@@ -86,7 +94,6 @@ setTimeout(()=>{
   elem.disabled = false;
 },500)
 }
-
 // post a note to the server
 async function postFetch(url,obj){
  const response = await fetch(url,{headers:{'Content-Type':'application/json'},method:'POST',body:JSON.stringify(obj)}).then(r=>r.json()).then(pay=>{
@@ -180,7 +187,7 @@ function scrollTopFn(e){
   let lis = [...ol.children] // [li,li,li]
   let idx = 0, base = 0, target
   for(let i = 0; i < lis.length; i++){
-  let scrollLimit = (e.currentTarget.scrollTop - filtercontainer.clientHeight) % lis[idx].clientHeight
+  let scrollLimit = (e.currentTarget.scrollTop) % lis[idx].clientHeight
       let slot = lis[idx].children[2] // .time-slot
       let del = lis[idx].children[1] // delete note
       // if ceiling is scrolled [DOWN] past the END of li & we are not on the last li
@@ -196,6 +203,8 @@ function scrollTopFn(e){
         // method in current li
         slot.style = `top:${scrollLimit}px`
         del.style = `top:${scrollLimit}px`
+      } else {
+        return null;
       }
       if(e.currentTarget.scrollTop == base){
         slot.style = `top:${base}px`
@@ -220,6 +229,10 @@ async function removeNote(e){
     const container = li.parentElement;
     container.removeChild(li)
     deleteFetch('/note',payload)
+    // if client has 1 note
+    if(document.querySelectorAll('.textarea-list-container>li').length<1){
+      filterbtn.classList.add('make-transparent')
+    }
 }
 async function removeAllNotes(e){
   
@@ -240,7 +253,7 @@ function toggleFilter(e){
       btndown = 'translateButnDwn',
       btnup = 'translateButnUp'
   const target = e.currentTarget;
-  const input = document.querySelector('#filterid')
+  
   if(!input.classList.contains(showfilter) && listcontainer.children.length > 0){
     input.classList.remove(hidefilter)
     input.focus()
@@ -258,15 +271,22 @@ function toggleFilter(e){
 }
 // filter notes
 async function filternotes(e){
-  let hide = 'hide-li'
   let input = e.currentTarget;
   let updateregex = input.value
   const children = [...document.querySelector('.textarea-list-container').children]
   const regexp = new RegExp(updateregex,'gi')
   // filter notes
-  console.log(regexp)
-  children.filter(ch=>regexp.test(ch.children[0].textContent) ? ch.style='display:block' : ch.style='display:none')
+  children.filter(ch=>{
+    console.log(ch.children[0].textContent.match(regexp))
+    return regexp.test(ch.children[0].textContent) ? ch.style='display:block' : ch.style='display:none'})
   console.log(children)
   
 
+}
+// keydown function
+function keydownFn(e){
+  if(document.querySelectorAll('.textarea-list-container>li').length<=0)filterbtn.classList.add('make-transparent')
+}
+function mouseOverFilterBtn(e){
+  if(document.querySelectorAll('.textarea-list-container>li').length>0)e.currentTarget.classList.remove('make-transparent');
 }
