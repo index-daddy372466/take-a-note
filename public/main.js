@@ -50,7 +50,6 @@ textarea.onkeydown = keydownFn
 
 
 
-
 // helper function to format textarea (security)
 function formatTextArea(textarea){
   textarea.value = textarea.value.replace(
@@ -197,16 +196,13 @@ function scrollTopFn(e){
         idx+=1
         target = lis[idx]
       }
-
-      
       // if ceiling is between indexed li
       if((ceiling >= lis[idx].getBoundingClientRect().y && ceiling <= (lis[idx].getBoundingClientRect().y + lis[idx].clientHeight))) {
         // method in current li
         slot.style = `top:${scrollLimit}px`
         del.style = `top:${scrollLimit}px`
-      } else {
-        return null;
-      }
+      } 
+
       if(e.currentTarget.scrollTop == base){
         slot.style = `top:${base}px`
         del.style = `top:${base}px`
@@ -286,11 +282,7 @@ async function filternotes(e){
   const regexp = new RegExp(updateregex,'gi')
   // filter notes
   children.filter(ch=>{
-    console.log(ch.children[0].textContent.match(regexp))
     return regexp.test(ch.children[0].textContent) ? ch.style='display:block' : ch.style='display:none'})
-  console.log(children)
-  
-
 }
 // keydown function
 function keydownFn(e){
