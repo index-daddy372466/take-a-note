@@ -236,11 +236,9 @@ async function removeNote(e){
       filterbtn.classList.remove(btndown)
       input.classList.remove('show-filter')
       input.classList.add('hide-filter')
-      
     }
 }
 async function removeAllNotes(e){
-  
   e.preventDefault()
   textarea.focus()
   const notes = document.querySelectorAll('.textarea-list-container>li');
@@ -250,6 +248,17 @@ async function removeAllNotes(e){
   }
 
   deleteFetch('/notes',{bool:true})
+
+  const btndown = 'translateButnDwn',
+      btnup = 'translateButnUp'
+    if(document.querySelectorAll('.textarea-list-container>li').length<1){
+      filterbtn.classList.add('make-transparent')
+      filterbtn.classList.add('no-pointer')
+      filterbtn.classList.add(btnup)
+      filterbtn.classList.remove(btndown)
+      input.classList.remove('show-filter')
+      input.classList.add('hide-filter')
+    }
 }
 // filter toggle with filter button
 function toggleFilter(e){

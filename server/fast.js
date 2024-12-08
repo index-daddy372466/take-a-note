@@ -111,9 +111,9 @@ fastify.get("/filter", async (req, res) => {
     const client = await fastify.pg.connect()
     console.log(spxnote)
     const id = req.session.user.id
-    // let relnotes = await client.query('select * from notepad where user_id = $1 and notes ~~* $2',[id,`%${note}%`])
-    // let relnotes = await client.query('select * from notepad where user_id = $1 and notes = $2',[id,spxnote])
-    let relnotes = await client.query('select * from notepad where notes = $1;',[spxnote])
+    let relnotes = await client.query('select * from notepad where user_id = $1 and notes ~~* $2',[id,`%${note}%`])
+    // let relnotes = await client.query('select * from notepad where notes = $1;',[spxnote])
+    console.log('relnotes')
     console.log(relnotes.rows)
     let relnotesv2 = relnotes.rows.map(x=>{
       const dateinfo = {
@@ -228,19 +228,6 @@ async function addUerToDb(client, id) {
     throw new Error(err);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
