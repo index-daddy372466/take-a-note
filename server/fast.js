@@ -68,8 +68,9 @@ fastify.post("/note", async (req, res) => {
   console.log(dateinfo)
   const client = await fastify.pg.connect()
   const { note } = req.body;
+  const statement = "insert into notepad(notes,user_id,unix) values($1,$2,$3)"
   await client.query(
-    "insert into notepad(notes,user_id,unix) values($1,$2,$3)",
+    statement,
     [note, req.session.user.id,dateinfo.unix]);
     console.log(note)
   if(req.session.user){
@@ -111,8 +112,9 @@ fastify.get("/filter", async (req, res) => {
     const client = await fastify.pg.connect()
     console.log(spxnote)
     const id = req.session.user.id
-    let relnotes = await client.query('select * from notepad where user_id = $1 and notes ~~* $2',[id,`%${note}%`])
-    // let relnotes = await client.query('select * from notepad where notes = $1;',[spxnote])
+    // let relnotes = await client.query('select * from notepad where user_id = $1 and notes ~~* $2',[id,`%${spxnote}%`])
+    // let relnotes = await client.query('select * from notepad where user_id = $1 and notes = $2;',[id,spxnote])
+    let relnotes = await client.query('select * from notepad where notes=$1',[spxnote])
     console.log('relnotes')
     console.log(relnotes.rows)
     let relnotesv2 = relnotes.rows.map(x=>{

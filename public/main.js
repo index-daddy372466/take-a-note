@@ -21,24 +21,23 @@ const urls = {
   note:'/note',
   delete:'/delete',
 }
+// get current notes
 getList(urls.note)
-
-
 // post a note on click
 btn['post'].onclick = async e => {
+  const target = e.currentTarget;
   e.preventDefault();
-  const value = formatTextArea(textarea);
+  const value = purifyText(textarea.value);
   if(!value){
     console.log('no value in textarea')
     return null
   } else {
-    const target = e.currentTarget;
+    // post a note fn
     const response = await postFetch(urls['note'],{note:value});
+    postNoteFn(response,listcontainer)
     controlPostUI(target);
-    console.log(response)
     // clear writingpad
     textarea.value = null;
-    postNoteFn(response,listcontainer)
   }
 }
 // toggle filter button
@@ -48,24 +47,112 @@ filterbtn.onmouseenter = mouseOverFilterBtn
 // key down event listener on textarea
 textarea.onkeydown = keydownFn
 
-
-
-// helper function to format textarea (security)
-function formatTextArea(textarea){
-  textarea.value = textarea.value.replace(
-    /[;\)\(\_\~\+\=\^\%\$\#\@\!\&\*\|\[\])]/g,
-    ""
-  );
-  return textarea.value
-};
+// post a note to the server
+async function postFetch(url,obj){
+  const response = await fetch(url,{headers:{'Content-Type':'application/json'},method:'POST',body:JSON.stringify(obj)}).then(r=>r.json()).then(pay=>{
+   console.log(pay)
+   return pay
+ })
+ return response
+ }
+ // get notes from server
+ async function getFetch(url){
+   const response = await fetch(url).then(r=>r.json()).then(pay=>pay)
+   console.log(response)
+   return response;
+ }
+ // delete notes on server
+ async function deleteFetch(url,data){
+   await fetch(url,{headers:{'Content-Type':'application/json'},method:'DELETE',body:JSON.stringify(data)})
+ }
+ // display the list of notes
+ async function getList(url){
+ // clear list before fetch
+   // getFetch('/note')
+   let arr = await getFetch(url)
+   console.log(arr)
+   arr = arr['data']||undefined
+   console.log(arr)
+   if(!arr){
+     return null
+   } else {
+     arr.forEach(obj=>{
+       let str = obj.note, date = obj.timestamp
+       const li = document.createElement('li')
+       const p = document.createElement('p')
+       const del = document.createElement('p')
+       del.textContent = 'x';
+       del.classList.add('remove-li')
+ 
+       p.innerHTML = purifyText(str);
+       // p.innerHTML = (str);
+       li.appendChild(p)
+       li.appendChild(del)
+       listcontainer.appendChild(li)
+       console.log(date)
+       createTimeSlot(date,li)
+       del.onclick = removeNote
+     })
+     textTop.onscroll = scrollTopFn
+     clearall.onclick = removeAllNotes
+     const items = document.querySelectorAll('.textarea-list-container>li')
+     items.forEach((item,idx)=>{
+       // scrolltop fn to each item
+       item.onscroll = scrollTopFn
+     })
+   document.getElementById('filterid').oninput = filternotes
+ 
+   }
+ }
+ // remove single note/all notes
+ async function removeNote(e){
+   // variables
+     const li = e.currentTarget.parentElement;
+     const text = purifyText(li.children[0].textContent)
+     // const text = (li.children[0].textContent)
+     const payload = {text:text}
+     const container = li.parentElement;
+     container.removeChild(li)
+     deleteFetch('/note',payload)
+     // if client has 1 note
+     const btndown = 'translateButnDwn',
+       btnup = 'translateButnUp'
+     if(document.querySelectorAll('.textarea-list-container>li').length<1){
+       filterbtn.classList.add('make-transparent')
+       filterbtn.classList.add('no-pointer')
+       filterbtn.classList.add(btnup)
+       filterbtn.classList.remove(btndown)
+       input.classList.remove('show-filter')
+       input.classList.add('hide-filter')
+     }
+ }
+ async function removeAllNotes(e){
+   e.preventDefault()
+   textarea.focus()
+   const notes = document.querySelectorAll('.textarea-list-container>li');
+   const container = document.querySelector('.textarea-list-container')
+   for(let i = 0; i < notes.length; i++){
+     container.removeChild(notes[i])
+   }
+ 
+   deleteFetch('/notes',{bool:true})
+ 
+   const btndown = 'translateButnDwn',
+       btnup = 'translateButnUp'
+     if(document.querySelectorAll('.textarea-list-container>li').length<1){
+       filterbtn.classList.add('make-transparent')
+       filterbtn.classList.add('no-pointer')
+       filterbtn.classList.add(btnup)
+       filterbtn.classList.remove(btndown)
+       input.classList.remove('show-filter')
+       input.classList.add('hide-filter')
+     }
+ }``
 function postNoteFn(obj,container){
-  filterbtn.classList.remove('no-pointer')
 textarea.focus()
-const note = obj.note;
-const date = obj.date
-const li = document.createElement('li')
-const p = document.createElement('p')
-const del = document.createElement('p')
+const note = obj.note, date = obj.date
+filterbtn.classList.remove('no-pointer')
+const li = document.createElement('li'), p = document.createElement('p'), del = document.createElement('p')
 del.textContent = 'x';
 del.classList.add('remove-li')
 
@@ -93,63 +180,6 @@ setTimeout(()=>{
   elem.classList.remove('no-pointer')
   elem.disabled = false;
 },500)
-}
-// post a note to the server
-async function postFetch(url,obj){
- const response = await fetch(url,{headers:{'Content-Type':'application/json'},method:'POST',body:JSON.stringify(obj)}).then(r=>r.json()).then(pay=>{
-  console.log(pay)
-  return pay
-})
-return response
-}
-// get notes from server
-async function getFetch(url){
-  const response = await fetch(url).then(r=>r.json()).then(pay=>pay)
-  console.log(response)
-  return response;
-}
-// delete notes on server
-async function deleteFetch(url,data){
-  await fetch(url,{headers:{'Content-Type':'application/json'},method:'DELETE',body:JSON.stringify(data)})
-}
-// display the list of notes
-async function getList(url){
-// clear list before fetch
-  // getFetch('/note')
-  let arr = await getFetch(url)
-  console.log(arr)
-  arr = arr['data']||undefined
-  console.log(arr)
-  if(!arr){
-    return null
-  } else {
-    arr.forEach(obj=>{
-      let str = obj.note, date = obj.timestamp
-      const li = document.createElement('li')
-      const p = document.createElement('p')
-      const del = document.createElement('p')
-      del.textContent = 'x';
-      del.classList.add('remove-li')
-
-      p.innerHTML = purifyText(str);
-      // p.innerHTML = (str);
-      li.appendChild(p)
-      li.appendChild(del)
-      listcontainer.appendChild(li)
-      console.log(date)
-      createTimeSlot(date,li)
-      del.onclick = removeNote
-    })
-    textTop.onscroll = scrollTopFn
-    clearall.onclick = removeAllNotes
-    const items = document.querySelectorAll('.textarea-list-container>li')
-    items.forEach((item,idx)=>{
-      // scrolltop fn to each item
-      item.onscroll = scrollTopFn
-    })
-  document.getElementById('filterid').oninput = filternotes
-
-  }
 }
 // remove year from date
 function shaveYear(str){
@@ -216,50 +246,6 @@ function scrollTopFn(e){
   }
   document.getElementById('filterid').oninput = filternotes
 }
-// remove single note/all notes
-async function removeNote(e){
-  // variables
-    const li = e.currentTarget.parentElement;
-    const text = purifyText(li.children[0].textContent)
-    // const text = (li.children[0].textContent)
-    const payload = {text:text}
-    const container = li.parentElement;
-    container.removeChild(li)
-    deleteFetch('/note',payload)
-    // if client has 1 note
-    const btndown = 'translateButnDwn',
-      btnup = 'translateButnUp'
-    if(document.querySelectorAll('.textarea-list-container>li').length<1){
-      filterbtn.classList.add('make-transparent')
-      filterbtn.classList.add('no-pointer')
-      filterbtn.classList.add(btnup)
-      filterbtn.classList.remove(btndown)
-      input.classList.remove('show-filter')
-      input.classList.add('hide-filter')
-    }
-}
-async function removeAllNotes(e){
-  e.preventDefault()
-  textarea.focus()
-  const notes = document.querySelectorAll('.textarea-list-container>li');
-  const container = document.querySelector('.textarea-list-container')
-  for(let i = 0; i < notes.length; i++){
-    container.removeChild(notes[i])
-  }
-
-  deleteFetch('/notes',{bool:true})
-
-  const btndown = 'translateButnDwn',
-      btnup = 'translateButnUp'
-    if(document.querySelectorAll('.textarea-list-container>li').length<1){
-      filterbtn.classList.add('make-transparent')
-      filterbtn.classList.add('no-pointer')
-      filterbtn.classList.add(btnup)
-      filterbtn.classList.remove(btndown)
-      input.classList.remove('show-filter')
-      input.classList.add('hide-filter')
-    }
-}
 // filter toggle with filter button
 function toggleFilter(e){
   const showfilter = 'show-filter',
@@ -300,6 +286,7 @@ function keydownFn(e){
     filterbtn.classList.add('make-transparent')
   }
 }
+// mouseover function
 function mouseOverFilterBtn(e){
   if(document.querySelectorAll('.textarea-list-container>li').length>0){
     filterbtn.classList.remove('no-pointer')
