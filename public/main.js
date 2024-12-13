@@ -1,6 +1,7 @@
 // vars
 const wrapper = document.getElementById('wrapper')
 const textarea = document.getElementById('textarea')
+const listcontainer = document.querySelector('.textarea-list-container')
 const btn = {
   post:document.querySelector('.post'),
   clear:document.getElementById('clear'),
@@ -27,7 +28,7 @@ btn['post'].onclick = async e => {
   controlPostUI(target);
   // clear writingpad
   textarea.value = null;
-  postNoteFn(response,document.querySelector('.textarea-list-container'))
+  postNoteFn(response,listcontainer)
 }
 
 
@@ -87,3 +88,15 @@ const formatTextArea = (textarea) => {
   );
   return textarea.value
 };
+
+// fetch notes
+window.onload = fetchNotes
+
+
+async function fetchNotes(e){
+  const response = await fetch('/notes',{referrer:"unsafe-url"}).then(r=>r.json()).then(d=>{
+    return d.notes
+  })
+  let res = await response
+  console.log(res)
+}

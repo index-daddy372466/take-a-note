@@ -38,7 +38,33 @@ app.route('/filter').get(async(req,res)=>{
   res.json(getNote.rows)
 })
 
-
+app.route('/notes').get(async(req,res)=>{
+  const note = req.query.note
+  try{
+    if(!note||Object.values(req.query).length < 1){
+      // select all notes from notepad
+      const getnotes = await pool.query('select notes from notepad')
+      const notes = getnotes.rows
+      return res.status(200) ? res.json({notes:notes}) : res.json({notes:undefined})
+    } else if (note && note.indexOf('%')!=-1){
+      // search for pattern
+      const getnotes = await pool.query('select notes from notepad where notes like $1',[note])
+      const notes = getnotes.rows
+      return res.status(200) ? res.json({notes:notes}) : res.json({notes:undefined})
+    }
+    
+      else { 
+      // select note by exact name
+      const getnotes = await pool.query('select notes from notepad where notes = $1',[note])
+      const notes = getnotes.rows
+      return res.status(200) ? res.json({notes:notes}) : res.json({notes:undefined})
+    }
+  }
+  catch(err){
+    console.log(err)
+    throw new Error(err)
+  }
+})
 
 
 // listen on server
