@@ -5,6 +5,8 @@ const { Pool } = require('pg')
 const fastPgConnection = {connectionString:`postgres://${process.env.DBU}:${process.env.PD}@${process.env.DBH}:${process.env.DBP}/${process.env.DB}`}
 const fastconnection = {fastPgConnection}
 
+const fastAdminConnection = {connectionString: `postgres://${process.env.DBUA}:${process.env.PDA}@${process.env.DBH}:${process.env.DBP}/${process.env.DB}`}
+const adminconnection = {fastAdminConnection}
 const pool = new Pool({
     user: process.env.DBU,
     database: process.env.DB,
@@ -14,4 +16,4 @@ const pool = new Pool({
 })
 
 
-module.exports = { pool, fastconnection };
+module.exports = { pool, fastconnection, adminconnection };

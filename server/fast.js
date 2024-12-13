@@ -8,7 +8,8 @@ const fastifyStatic = require("@fastify/static");
 const rootpath = require("path").resolve(__dirname, "../public");
 const PORT = process.env.PORT || 3001;
 const fastconn = require("../db.js").fastconnection;
-var methodOverride = require('method-override')
+const adminconn = require("../db.js").adminconnection;
+var methodOverride = require('method-override');
 
 
 // middleware
@@ -27,6 +28,9 @@ fastify.register(require("@fastify/session"), {
   cookieName: "sessionId",
   cookie: { maxAge: 1800000, secure: false, httpOnly:true },
 });
+// fastify.register(require('./lib/abort.js'))
+// fastify.register(require("@fastify/postgres"), fastconn.fastPgConnection);
+fastify.register(require("@fastify/postgres"), adminconn.fastAdminConnection);
 fastify.register(()=>methodOverride('_method'))
 fastify.addHook("preHandler", async (req, res) => {
   const client = await fastify.pg.connect();
@@ -35,7 +39,7 @@ fastify.addHook("preHandler", async (req, res) => {
   // check for exisitng users
    if(!req.session.user && !(await checkExistingUsers(client,dateid))){
     req.session.user = {id:dateid,active:true,expired:false}
-    addUerToDb(client,dateid)
+    addUserToDb(client,dateid)
    } else if(req.session && (await checkExistingUsers(client,req.session.user.id))){
     console.log('session is active and captured')
    } else {
@@ -222,7 +226,7 @@ async function checkExistingUsers(client, id) {
   return released.rows.length > 0
 }
 // add user to db
-async function addUerToDb(client, id) {
+async function addUserToDb(client, id) {
   try {
     // add user
     await client.query("insert into users(id) values($1)", [id])
@@ -231,12 +235,6 @@ async function addUerToDb(client, id) {
   }
 }
 
-
-
-
-
-// fastify.register(require('./lib/abort.js'))
-fastify.register(require("@fastify/postgres"), fastconn.fastPgConnection);
 
 // lisen on fastify server
 fastify.listen({ port: PORT, host: `127.0.0.1` }, (err, address) => {
