@@ -29,10 +29,12 @@ app.route('/note').post(async(req,res)=>{
 })
 
 // filter test
-app.route('/filter').get(async(req,res)=>{
-  const {note} = req.query
+app.route('/filter').post(async(req,res)=>{
+  const {note} = req.body
   console.log(note)
-  let getNote = await pool.query("select notes,timestamp from notepad where notes = $1",[note])
+  // let getNote = await pool.query("select notes,timestamp from notepad where notes = $1",[note])
+  const query = "select notes,timestamp from notepad where notes ='" + note + "';";
+  let getNote = await pool.query(query)
   console.log('notes rows')
   console.log(getNote.rows)
   res.json(getNote.rows)
@@ -50,14 +52,14 @@ app.route('/notes').get(async(req,res)=>{
       // search for pattern
       const getnotes = await pool.query('select notes from notepad where notes like $1',[note])
       const notes = getnotes.rows
-      return res.status(200) ? res.json({notes:notes}) : res.json({notes:undefined})
+      return res.json({notes:notes}) 
     }
-    
       else { 
       // select note by exact name
-      const getnotes = await pool.query('select notes from notepad where notes = $1',[note])
+      const query = "select notes from notepad where notes ='" + note + "';";
+      const getnotes = await pool.query(query)
       const notes = getnotes.rows
-      return res.status(200) ? res.json({notes:notes}) : res.json({notes:undefined})
+      return res.json({notes:notes}) 
     }
   }
   catch(err){
