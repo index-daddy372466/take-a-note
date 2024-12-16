@@ -1,34 +1,17 @@
-## The Note-taking Module
+# Case Study: Take a Note
+<img src="./media/photo1.intro.jpg"/>
 
-**Languages**:
-1. HTML
-2. CSS
-3. Javascript
+## Description
 
-**Framework**:
-1. NodeJs
-
-**Database**:
-1. PostgreSql
-
-## About the project
-
-This application enables the user to write notes on a limited & secure session. User login is not required because each session's id is associated with the current date-time the session is create, then hashed before storing into the database.
-Sessions expire 30 minutes after the session begins.
-upon expiration, database functions **DELETE** rows of the expired user's id within the users table.
-In addition, notes are deleted 30 minutes after a note is created.
-This project/Application is free for public use.
+- The focus of this case study is on a basic note-taking module, _Take a Note_, where security can be improved. Users wants to feel safe knowing their personal data is posted & saved in a secure database. This application will delve into encrypting/decrypting data within the server before __posting__ to the database & __getting__ information from the database respectively.
 
 
-## Symmetric encryption
+### Issue:
 
-<em>Authentication Encryption Standard (AES) 256</em><br>
-Before storing notes into the database, user input is encrypted in the server. Notes are decrypted in the server after retrieving encrypted notes from the database.
+1. #### Data stored in the database in plain-text inside database, including the user's id <br>
 
+<img src="./media/photo3.notestable.jpg"/>
 
-<em>Writing notes to the server & storing into a database for selecting</em>
-<img src="./media/notes-test.jpg">
-<em>The Key (buffer) & Initialization Vector (original & hex)</em>
-<img src="./media/notes-test-verify-key-and-iv.jpg">
-<em>Encrypted json data in database along with stored Initialization vector</em>
-<img src="./media/notes-test-console.jpg" >
+### Application Setup
+
+_Take a Note_ is a static website using ```ejs``` built on top of a server using ```fastify```.
