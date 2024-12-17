@@ -8,6 +8,12 @@ const pool = new Pool({
     port: process.env.DBP,
     host:process.env.DBH,
 })
+const adminpool = new Pool({
+    user: process.env.DBUA,
+    database: process.env.DB,
+    password: process.env.PDA,
+    port: process.env.DBP,
+    host:process.env.DBH,
+})
 
-
-module.exports = { pool };
+module.exports = { pool,adminpool };

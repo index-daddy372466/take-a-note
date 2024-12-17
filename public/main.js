@@ -18,7 +18,8 @@ textarea.onblur = textareaBlur
 // post a note on click
 btn['post'].onclick = async e => {
   e.preventDefault();
-  const value = formatTextArea(textarea);
+  // const value = formatTextArea(textarea);
+  const value =(textarea.value);
   if(!value){
     console.log('no value in textarea')
     return null
@@ -26,6 +27,7 @@ btn['post'].onclick = async e => {
   const target = e.currentTarget;
   const response = await postFetch(urls['note'],{note:value});
   controlPostUI(target);
+  console.log(response)
   // clear writingpad
   textarea.value = null;
   postNoteFn(response,listcontainer)
@@ -76,7 +78,7 @@ function textareaBlur(e){
 // post a note to the server
 async function postFetch(url,obj){
  const response = await fetch(url,{headers:{'Content-Type':'application/json'},method:'POST',body:JSON.stringify(obj)}).then(r=>r.json()).then(pay=>{
-  return pay
+  return pay['note']||pay.note
 })
 return response
 }
@@ -94,7 +96,7 @@ window.onload = fetchNotes
 
 
 async function fetchNotes(e){
-  const response = await fetch('/notes',{referrer:"unsafe-url"}).then(r=>r.json()).then(d=>{
+  const response = await fetch('/notes').then(r=>r.json()).then(d=>{
     return d.notes
   })
   let res = await response
