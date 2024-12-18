@@ -252,6 +252,9 @@ margin-right:.25rem;
     list-style-type: none;
 
 }
+#title{
+    margin-left:1rem;
+}
 #title-container{
     position:fixed;
     top:25px;

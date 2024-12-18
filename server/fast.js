@@ -9,7 +9,7 @@ const rootpath = require("path").resolve(__dirname, "../public");
 const PORT = process.env.PORT || 3001;
 const fastconn = require("../db.js").fastconnection;
 const adminconn = require("../db.js").adminconnection;
-var methodOverride = require('method-override');
+const methodOverride = require('method-override');
 
 
 // middleware
@@ -72,11 +72,8 @@ fastify.post("/note", async (req, res) => {
   console.log(dateinfo)
   const client = await fastify.pg.connect()
   const { note } = req.body;
-  const statement = "insert into notepad(notes,user_id,unix) values($1,$2,$3)"
-  await client.query(
-    statement,
-    [note, req.session.user.id,dateinfo.unix]);
-    console.log(note)
+  const query = "insert into notepad(notes,user_id,unix) values('"+note+"','"+req.session.user.id+"','"+dateinfo.unix+"')"
+  await client.query(query)
   if(req.session.user){
     res
     .code(200)
@@ -88,9 +85,8 @@ fastify.post("/note", async (req, res) => {
 fastify.get("/note", async (req, res) => {
   try {
     const client = await fastify.pg.connect()
-    const notes = await client.query(
-      "select notes,timestamp from notepad where user_id=$1",
-      [req.session.user.id])
+    const query = "select notes,timestamp from notepad where user_id='"+req.session.user.id+"';"
+    const notes = await client.query(query)
     // decode the list of encoded notes with it's perspective iv
     const notesarr = [...notes.rows].map(x=>{
       const dateinfo = {
@@ -116,10 +112,7 @@ fastify.get("/filter", async (req, res) => {
     const client = await fastify.pg.connect()
     console.log(spxnote)
     const id = req.session.user.id
-    // let relnotes = await client.query('select * from notepad where user_id = $1 and notes ~~* $2',[id,`%${spxnote}%`])
-    // let relnotes = await client.query('select * from notepad where user_id = $1 and notes = $2;',[id,spxnote])
-    // let relnotes = await client.query('select * from notepad where notes=$1',[spxnote])
-    const query = "select notes,timestamp from notepad where notes ='" + spxnote + "';";
+    const query = "select notes,timestamp from notepad where user_id= '" + req.session.user.id + "' and notes ='" + spxnote + "';";
     const relnotes = await client.query(query)
     
     console.log('relnotes')
@@ -177,45 +170,6 @@ fastify.delete('/notes', async (req,res)=> {
     throw new Error(err)
   }
 })
-// filter users by creation date (id)
-fastify.get('/api/admin/filter/:table/:column', async(req,res)=>{
-  const client = await fastify.pg.connect()
-  const {table,column} = req.params
-  console.log(req.params)
-  let {from,to,limit} = req.query, query
-  // let column = /users/.test(table) ? 'id' : /notepad/.test(table) ? 'timestamp' : undefined;
-  
-  try{
-      if(from && !to){
-        // from = new Date(`${from}`).getTime()
-        query = await client.query(`select * from ${table} where ${column} >= $1`,[from])
-      }
-      if(!from && to){
-        // to = new Date(`${to}`).getTime()
-        query = await client.query(`select * from ${table} where ${column} <= $1`,[+to])
-        console.log('WTF!!!')
-        console.log(to)
-      }
-      if(from && to){
-        // from = new Date(`${from}`).getTime()
-        // to = new Date(`${to}`).getTime()
-        query = await client.query(`select * from ${table} where ${column} >= $1 and ${column} <= $2`,[from,to])
-      }
-      // if(/^(Invalid Date|NaN)$/.test(from)||/^(Invalid Date|NaN)$/.test(to)){
-      //   res.code(403)
-      //   .send('Unauthorized')
-      // }
-      console.log(from,to,limit)
-      console.log(query.rows)
-      res.code(200)
-      .header("Content-Type", "application/json; charset=utf-8")
-      .send({rows:query.rows});
-  }
-  catch(err){
-    console.log(err)
-    throw new Error(err)
-  }
-})
 
 
 // functions
@@ -223,7 +177,8 @@ fastify.get('/api/admin/filter/:table/:column', async(req,res)=>{
 // check if user exists by id
 async function checkExistingUsers(client, id) {
   // check for exisitng users
-  let released = await client.query("select * from users where id=$1",[id])
+  const query = "select * from users where id='" + id + "';"
+  let released = await client.query(query)
   client.release()
   console.log(released.rows)
   return released.rows.length > 0
@@ -232,7 +187,8 @@ async function checkExistingUsers(client, id) {
 async function addUserToDb(client, id) {
   try {
     // add user
-    await client.query("insert into users(id) values($1)", [id])
+    const query = "insert into users(id) values('" + id + "');"
+    await client.query(query)
   } catch (err) {
     throw new Error(err);
   }
