@@ -29,8 +29,8 @@ fastify.register(require("@fastify/session"), {
   cookie: { maxAge: 1800000, secure: false, httpOnly:true },
 });
 // fastify.register(require('./lib/abort.js'))
-// fastify.register(require("@fastify/postgres"), fastconn.fastPgConnection);
-fastify.register(require("@fastify/postgres"), adminconn.fastAdminConnection);
+fastify.register(require("@fastify/postgres"), fastconn.fastPgConnection);
+// fastify.register(require("@fastify/postgres"), adminconn.fastAdminConnection);
 fastify.register(()=>methodOverride('_method'))
 fastify.addHook("preHandler", async (req, res) => {
   const client = await fastify.pg.connect();
@@ -72,6 +72,7 @@ fastify.post("/note", async (req, res) => {
   console.log(dateinfo)
   const client = await fastify.pg.connect()
   const { note } = req.body;
+  console.log(note)
   const query = "insert into notepad(notes,user_id,unix) values('"+note+"','"+req.session.user.id+"','"+dateinfo.unix+"')"
   await client.query(query)
   if(req.session.user){
