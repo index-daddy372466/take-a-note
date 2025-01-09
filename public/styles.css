@@ -217,9 +217,13 @@ background:white;
     }
 .hide-filter{
     top:-200px;
+    opacity:0;
+    pointer-events: none;
 }
 .show-filter{
     top:0px;
+    opacity:1;
+    pointer-events: unset;
 }
 
 .time-slot{
