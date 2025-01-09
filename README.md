@@ -15,3 +15,7 @@
 ### Application Setup
 
 _Take a Note_ is a static website using ```ejs``` built on top of a server using ```fastify```.
+Click here to try Express version
+
+<img src="./media/photo3.notestable.jpg"/>
+

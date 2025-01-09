@@ -1,6 +1,12 @@
 require('dotenv').config()
 const { Pool } = require('pg')
+// pg string example
+//postgres://user:password@host:port/db
+const fastPgConnection = {connectionString:`postgres://${process.env.DBU}:${process.env.PD}@${process.env.DBH}:${process.env.DBP}/${process.env.DB}`}
+const fastconnection = {fastPgConnection}
 
+const fastAdminConnection = {connectionString: `postgres://${process.env.DBUA}:${process.env.PDA}@${process.env.DBH}:${process.env.DBP}/${process.env.DB}`}
+const adminconnection = {fastAdminConnection}
 const pool = new Pool({
     user: process.env.DBU,
     database: process.env.DB,
@@ -8,6 +14,13 @@ const pool = new Pool({
     port: process.env.DBP,
     host:process.env.DBH,
 })
+const adminpool = new Pool({
+    user: process.env.DBUA,
+    database: process.env.DB,
+    password: process.env.PDA,
+    port: process.env.DBP,
+    host:process.env.DBH,
+})
 
 
-module.exports = { pool };
+module.exports = { pool, adminpool, fastconnection, adminconnection };

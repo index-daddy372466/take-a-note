@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.1/purify.min.js" integrity="sha512-PBUtfPzExa/FxBEi6tr884CPkb9Wh0kjchdWPECubdH16+G0JjkGQHgWCO7zgINZlXtmVnpII7KnZctAPUAZWg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <meta charset="UTF-8" />
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"
@@ -17,10 +18,22 @@
     <title>notes App</title>
   </head>
   <body>
+    <div id="title-container">
+      <h1 id="title">Take a Note</h1>
+    </div>
     <div id="wrapper" class="starter-focus">
       <!--notes area-->
       <div id="textarea-container" class="hidden">
         <div id="textarea-top">
+          <!-- filter -->
+          <div id="filter-container">
+            <div id="filter-button" class="make-transparent">
+              <span class="filter-span"></span>
+              <span class="filter-span"></span>
+              <span class="filter-span"></span>
+            </div>
+            <input type="text" name="spxnote" id="filterid" class="hide-filter">
+          </div>
           <ol class="textarea-list-container"></ol>
         </div>
 
@@ -28,14 +41,13 @@
         <form
           class="textarea-form"
           action="/delete"
-          method="POST"
+          method="DELETE"
           id="delete"
         ></form>
         <form class="textarea-form" action="/note" method="POST">
           <textarea
             id="textarea"
             name="notes"
-            class="blurtext"
             cols="50"
             rows="5"
             wrap="physical"
