@@ -7,15 +7,14 @@
 
 
 ### Issue:
+1. #### Database queries are vulnerable to sql-injection attacks.
+2. #### Confidential data is stored in plain-text.
 
-1. #### Data stored in the database in plain-text inside database, including the user's id <br>
-
-<img src="./media/photo3.notestable.jpg"/>
 
 ### Application Setup
 
-_Take a Note_ is a static website using ```ejs``` built on top of a server using ```fastify```.
-Click here to try Express version
+_Take a Note_ is a static single-page application (SPA) rendering ```ejs``` from an  ```express``` web server.
+<br>
+Click here to try the Fastify version
 
-<img src="./media/photo3.notestable.jpg"/>
 

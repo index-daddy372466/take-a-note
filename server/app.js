@@ -23,11 +23,12 @@ app.use(session({
   resave:false,
   saveUninitialized:false
 }))
+app.use(userManager)
+
 // routes
 app.route('/').get(async(req,res)=>{
   res.render("index.ejs");
 })
-app.use(userManager)
 
 
 // post note
