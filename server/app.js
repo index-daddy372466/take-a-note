@@ -61,12 +61,18 @@ app.route('/filter').post(async(req,res)=>{
   res.json(getNote.rows)
 })
 
+// get notes by user's id
 app.route('/note').get(async(req,res)=>{
-  const note = req.query.note
+  const {note} = req.query
   try {
-    const query = "select notes,timestamp from notepad where user_id='"+req.session.user.id+"';"
+    let query;
+    if(note && Object.values(note).length>0){
+       query = "select notes,timestamp from notepad where notes = '"+note+ "' and user_id='"+req.session.user.id+"';"
+    } else {
+       query = "select notes,timestamp from notepad where user_id='"+req.session.user.id+"';"  
+    }
+    
     const notes = await pool.query(query)
-    // decode the list of encoded notes with it's perspective iv
     const notesarr = [...notes.rows].map(x=>{
       const dateinfo = {
         date: new Date(x.timestamp).toLocaleDateString(),
